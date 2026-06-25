@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Northlight Weekend - Home</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body data-page="home">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">N</span>
+          <div>
+            <p class="brand-kicker">Northlight Weekend</p>
+            <h1 class="brand-name">Public event microsite</h1>
+          </div>
+        </div>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="index.html" aria-current="page">Home</a><a href="program.html">Program</a><a href="tickets.html">Tickets</a><a href="venue.html">Venue</a><a href="compare.html">Compare</a><a href="answer-key.html">Repair key</a>
+        </nav>
+      </header>
+      <div class="flow-strip" aria-label="Site flow">
+        <span class="flow-pill is-active"><b>01</b>Home</span><span class="flow-pill"><b>02</b>Program</span><span class="flow-pill"><b>03</b>Tickets</span><span class="flow-pill"><b>04</b>Venue</span><span class="flow-pill"><b>05</b>Compare</span><span class="flow-pill"><b>06</b>Repair key</span>
+      </div>
+      <main id="main">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Observation page 1</p>
+            <h2>A public event microsite with deliberate accessibility gaps for review.</h2>
+            <p class="lead">This site is built as an object of observation. The pages look like a normal public microsite, but several components are intentionally not accessible so the differences can be discussed clearly.</p>
+          </div>
+          <aside class="hero-aside">
+            
+    <div class="dashboard-shell">
+      <div class="dashboard-top">
+        <span class="badge">Three-day event</span>
+        <span class="badge neutral">Public microsite</span>
+      </div>
+      <div class="dashboard-grid">
+        <article class="stat-card">
+    <span>Days</span>
+    <strong>3</strong>
+    <p>Friday to Sunday</p>
+  </article>
+        <article class="stat-card">
+    <span>Guests</span>
+    <strong>18</strong>
+    <p>Talks, workshops, performances</p>
+  </article>
+        <article class="stat-card">
+    <span>Venues</span>
+    <strong>4</strong>
+    <p>Hall, gallery, garden, stage</p>
+  </article>
+      </div>
+      <div class="preview-card mouse-only" data-href="program.html" id="home-feature">
+        <span class="eyebrow">Featured route</span>
+        <strong>Open the program overview</strong>
+        <p>Jump directly into the event schedule and session list.</p>
+      </div>
+    </div>
+          </aside>
+        </section>
+        
+    <section class="content-grid split">
+      <article class="panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Overview</p>
+            <h3>Welcome to Northlight Weekend</h3>
+          </div>
+          <span class="section-chip">Public home</span>
+        </div>
+        <div class="search-card">
+          <input class="input" type="search" placeholder="Search artists, talks, or venues" />
+        </div>
+        <div class="module-grid">
+          <a class="module-card" href="program.html">
+            <span class="module-meta">Program</span>
+            <strong>Browse sessions</strong>
+            <p>Check the order, times, and locations.</p>
+          </a>
+          <a class="module-card" href="tickets.html">
+            <span class="module-meta">Tickets</span>
+            <strong>Reserve a spot</strong>
+            <p>Pick a ticket type and confirm by email.</p>
+          </a>
+          <a class="module-card" href="venue.html">
+            <span class="module-meta">Venue</span>
+            <strong>See the spaces</strong>
+            <p>Find the hall, studio, and garden setup.</p>
+          </a>
+          <a class="module-card" href="compare.html">
+            <span class="module-meta">Repair view</span>
+            <strong>Compare before and after</strong>
+            <p>Use the side-by-side correction view.</p>
+          </a>
+        </div>
+      </article>
+      <aside class="panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">What to observe</p>
+            <h3>Small gaps, real impact</h3>
+          </div>
+          <span class="section-chip">Observation</span>
+        </div>
+        <div class="side-stack">
+          <article class="mini-card">
+            <span class="mini-kicker">Label check</span>
+            <strong>See how a field behaves when the label is hidden in the placeholder.</strong>
+          </article>
+          <article class="mini-card soft">
+            <span class="mini-kicker">Keyboard check</span>
+            <strong>Notice which cards move by click only and which ones can be tabbed.</strong>
+          </article>
+          <article class="mini-card">
+            <span class="mini-kicker">Contrast check</span>
+            <strong>Watch how weak text blends into the surface even on a polished layout.</strong>
+          </article>
+        </div>
+      </aside>
+    </section>
+  
+      </main>
+      <footer class="page-footer">
+        <div class="footer-note">The home page sets the visual language and hides the first two barriers.</div>
+        <div class="footer-nav" aria-label="Site navigation">
+          <span class="nav-button ghost disabled"><span>Back</span><strong>Start</strong></span>
+          <a class="nav-button solid" href="program.html"><span>Next</span><strong>Program</strong></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

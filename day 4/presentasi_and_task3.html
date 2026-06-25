@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WCAG Study Case - Static Observation Site</title>
+<style>
+  :root {
+    --bg: #f4efe6;
+    --panel: rgba(255,255,255,.86);
+    --ink: #172033;
+    --muted: #5a667b;
+    --line: rgba(23,32,51,.10);
+    --accent: #1f4dd1;
+    --accent-soft: rgba(31,77,209,.10);
+    --warn-soft: rgba(196,72,24,.10);
+    --good-soft: rgba(11,129,93,.10);
+    --shadow: 0 20px 50px rgba(23,32,51,.10);
+    --display: "Aptos Display", "Aptos", "Segoe UI", system-ui, sans-serif;
+    --body: "Aptos", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; overflow: hidden; background:
+    radial-gradient(circle at top left, rgba(31,77,209,.08), transparent 32%),
+    linear-gradient(180deg, #f7f2e9 0%, #efe8db 100%);
+    color: var(--ink); font-family: var(--body); }
+  body { position: relative; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3, p { margin: 0; }
+  .slide { display: none; min-height: 100vh; padding: 42px 48px 88px; }
+  .slide.active { display: block; }
+  .shell { height: 100%; display: grid; gap: 18px; align-content: start; }
+  .cover, .split, .grid-2 { display: grid; gap: 18px; }
+  .cover { grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr); align-items: center; }
+  .split { grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr); }
+  .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .eyebrow { color: var(--accent); font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .display { font-family: var(--display); font-size: clamp(50px, 7vw, 92px); line-height: .92; letter-spacing: -.08em; max-width: 11ch; }
+  .title { font-family: var(--display); font-size: clamp(32px, 4.8vw, 60px); line-height: .96; letter-spacing: -.07em; max-width: 13ch; }
+  .lead { margin-top: 14px; color: var(--muted); font-size: 18px; line-height: 1.45; max-width: 66ch; }
+  .panel, .hero-card, .page-card, .note-card, .metric, .issue-card, .mini-compare, .notes-box {
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+  }
+  .panel, .hero-card { padding: 22px; }
+  .hero-card { padding: 26px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 16px; background: linear-gradient(180deg, #2154db 0%, #173790 100%); color: white; font-weight: 900; }
+  .brand-name { margin-top: 4px; font-family: var(--display); font-size: 22px; letter-spacing: -.05em; }
+  .chips, .page-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,.9); border: 1px solid var(--line); font-size: 13px; font-weight: 800; }
+  .chip b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .metric { padding: 16px; }
+  .metric span { display: block; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+  .metric strong { display: block; margin-top: 8px; font-size: 24px; letter-spacing: -.05em; }
+  .metric p { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.35; }
+  .page-card { min-height: 156px; padding: 16px; display: grid; gap: 8px; }
+  .page-step { display: inline-flex; width: fit-content; padding: 7px 11px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+  .page-card strong { font-size: 22px; line-height: 1.05; letter-spacing: -.04em; }
+  .page-card p, .note-card p, .issue-card p, .mini-compare p { color: var(--muted); font-size: 15px; line-height: 1.45; }
+  .page-link { margin-top: auto; color: var(--accent); font-size: 14px; font-weight: 900; }
+  .stack { display: grid; gap: 12px; }
+  .note-card, .mini-compare, .issue-card { padding: 16px; }
+  .note-card strong, .mini-compare strong, .issue-card strong { display: block; font-size: 18px; letter-spacing: -.03em; }
+  .issue-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .issue-tag { display: inline-flex; width: fit-content; padding: 7px 11px; border-radius: 999px; background: var(--warn-soft); color: #9a3412; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+  .fix-note { margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: rgba(15,23,42,.96); color: #e2e8f0; font-size: 13px; line-height: 1.45; }
+  .compare-mini { display: grid; gap: 12px; margin-top: 18px; }
+  .mini-compare-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+  .mini-bad, .mini-good { padding: 10px 12px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+  .mini-bad { background: var(--warn-soft); color: #9a3412; }
+  .mini-good { background: var(--good-soft); color: #0b815d; }
+  #notesPanel { position: absolute; right: 24px; bottom: 104px; width: min(520px, calc(100% - 48px)); padding: 20px 22px; border-radius: 22px; background: rgba(15,20,32,.94); color: white; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 70px rgba(0,0,0,.35); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .22s ease; z-index: 10; }
+  #notesPanel.open { opacity: 1; transform: none; pointer-events: auto; }
+  #notesPanel h4 { margin: 0 0 8px; color: #ffd966; font-size: 15px; }
+  #notesPanel p { color: #edf2ff; font-size: 15px; line-height: 1.45; }
+  .notes { display: none; }
+  .nav-bar { position: absolute; inset: auto 24px 18px 24px; display: flex; align-items: center; gap: 14px; z-index: 9; }
+  .nav { width: 42px; height: 72px; border: 0; border-radius: 18px; background: rgba(23,32,51,.12); color: var(--ink); font-size: 32px; cursor: pointer; }
+  .hud { flex: 1; display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.84); box-shadow: var(--shadow); }
+  .bar { flex: 1; height: 4px; border-radius: 999px; overflow: hidden; background: rgba(23,32,51,.12); }
+  .bar span { display: block; width: 0; height: 100%; background: var(--accent); transition: width .24s ease; }
+  .count { min-width: 52px; text-align: right; font-weight: 900; color: var(--muted); }
+  @media (max-width: 1100px) {
+    .cover, .split, .grid-2, .issue-grid { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 780px) {
+    .slide { padding: 24px 18px 84px; }
+    .metric-grid, .mini-compare-grid { grid-template-columns: 1fr; }
+    #notesPanel { right: 16px; bottom: 96px; width: calc(100% - 32px); }
+    .nav-bar { inset: auto 16px 14px 16px; }
+  }
+</style>
+</head>
+<body>
+  <section class="slide active">
+    <div class="shell">
+      <div class="cover">
+        <div>
+          <div class="eyebrow">WCAG study case</div>
+          <h1 class="display">Static observation site with side-by-side repair.</h1>
+          <p class="lead">Use the neutral microsite as the observed artifact. Learners inspect the pages first, then move to the compare view and the repair key.</p>
+          <div class="chips" style="margin-top:18px;">
+            <span class="chip">Labels</span>
+            <span class="chip">Keyboard</span>
+            <span class="chip">Contrast</span>
+            <span class="chip">Semantics</span>
+            <span class="chip">Errors</span>
+            <span class="chip">Media</span>
+            <span class="chip"><b>N</b> Toggle speaker notes</span>
+          </div>
+        </div>
+        <aside class="hero-card">
+          <div class="brand">
+            <span class="brand-mark">N</span>
+            <div>
+              <div class="eyebrow">Northlight Weekend</div>
+              <div class="brand-name">Observation microsite</div>
+            </div>
+          </div>
+          <div class="metric-grid">
+            <article class="metric"><span>Pages</span><strong>6</strong><p>Home, program, tickets, venue, compare, key.</p></article>
+            <article class="metric"><span>Issues</span><strong>7</strong><p>Deliberate gaps for analysis and repair.</p></article>
+            <article class="metric"><span>Mode</span><strong>Static</strong><p>No backend complexity, only observation flow.</p></article>
+          </div>
+        </aside>
+      </div>
+      <div class="notes">Introduce the site as a neutral artifact. The teaching happens through observation and repair, not through the site topic itself.</div>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="shell">
+      <div class="split">
+        <section class="panel">
+          <div class="eyebrow">Clickable flow</div>
+          <h2 class="title">Move through the pages, then switch to compare.</h2>
+          <p class="lead">The flow is simple on purpose, so the audience can focus on accessibility details instead of figuring out navigation.</p>
+          <div class="page-row" style="margin-top:18px;">
+        <a class="page-card" href="./wcag_study_case_static_site/index.html" target="_blank" rel="noreferrer">
+          <span class="page-step">01</span>
+          <strong>Home</strong>
+          <p>Search + promo card</p>
+          <span class="page-link">Open page</span>
+        </a>
+        <a class="page-card" href="./wcag_study_case_static_site/program.html" target="_blank" rel="noreferrer">
+          <span class="page-step">02</span>
+          <strong>Program</strong>
+          <p>Contrast + structure</p>
+          <span class="page-link">Open page</span>
+        </a>
+        <a class="page-card" href="./wcag_study_case_static_site/tickets.html" target="_blank" rel="noreferrer">
+          <span class="page-step">03</span>
+          <strong>Tickets</strong>
+          <p>Labels + errors</p>
+          <span class="page-link">Open page</span>
+        </a>
+        <a class="page-card" href="./wcag_study_case_static_site/venue.html" target="_blank" rel="noreferrer">
+          <span class="page-step">04</span>
+          <strong>Venue</strong>
+          <p>Media + alt text</p>
+          <span class="page-link">Open page</span>
+        </a>
+        <a class="page-card" href="./wcag_study_case_static_site/compare.html" target="_blank" rel="noreferrer">
+          <span class="page-step">05</span>
+          <strong>Compare</strong>
+          <p>Observed vs fixed</p>
+          <span class="page-link">Open page</span>
+        </a>
+        <a class="page-card" href="./wcag_study_case_static_site/answer-key.html" target="_blank" rel="noreferrer">
+          <span class="page-step">06</span>
+          <strong>Repair key</strong>
+          <p>Discussion summary</p>
+          <span class="page-link">Open page</span>
+        </a></div>
+        </section>
+        <aside class="panel">
+          <div class="eyebrow">What to inspect</div>
+          <div class="stack" style="margin-top:12px;">
+            <article class="note-card"><strong>Fields and labels</strong><p>Check whether names stay visible after users start typing.</p></article>
+            <article class="note-card"><strong>Cards and focus</strong><p>Look for actions that work with a pointer but not with keyboard navigation.</p></article>
+            <article class="note-card"><strong>Media support</strong><p>Check images, video areas, and transcript access.</p></article>
+          </div>
+        </aside>
+      </div>
+      <div class="notes">Walk page by page. Keep the audience in observation mode first.</div>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="shell">
+      <section class="panel">
+        <div class="eyebrow">Issue map</div>
+        <h2 class="title">Name the barrier, the impact, and the fix.</h2>
+        <p class="lead">This slide is the main discussion surface. Keep the explanation direct and concrete.</p>
+        <div class="issue-grid">
+        <article class="issue-card">
+          <span class="issue-tag">Labels and instructions</span>
+          <strong>Search field on Home</strong>
+          <p>The search box relies on placeholder text only, so the purpose disappears as soon as the user types.</p>
+          <div class="fix-note">Fix: Add a visible label and keep the helper text outside the placeholder.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Keyboard / operable</span>
+          <strong>Featured card on Home</strong>
+          <p>The feature card is only clickable with a pointer, so keyboard users cannot activate it.</p>
+          <div class="fix-note">Fix: Use a real link or button and keep a visible focus state.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Contrast</span>
+          <strong>Status text on Program</strong>
+          <p>The status text is too light against the background, so it is harder to read.</p>
+          <div class="fix-note">Fix: Use sufficient contrast for text and badges.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Semantics</span>
+          <strong>Schedule grid on Program</strong>
+          <p>The schedule is built from generic cards, so the relationships between time and session are not explicit.</p>
+          <div class="fix-note">Fix: Use a semantic table or another structure with clear headers and rows.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Labels and instructions</span>
+          <strong>Email field on Tickets</strong>
+          <p>The email field uses placeholder text only, which makes the instruction brittle and easy to miss.</p>
+          <div class="fix-note">Fix: Add a visible label and a short support hint below the field.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Error identification</span>
+          <strong>Validation message on Tickets</strong>
+          <p>The error copy is vague and leans on color alone instead of explaining the exact problem.</p>
+          <div class="fix-note">Fix: Name the failing field and say what format or value is expected.</div>
+        </article>
+        <article class="issue-card">
+          <span class="issue-tag">Media / text alternatives</span>
+          <strong>Media block on Venue</strong>
+          <p>The media card lacks captions, transcript access, and meaningful alternative text for the event images.</p>
+          <div class="fix-note">Fix: Provide alt text, captions, and a transcript link beside the player.</div>
+        </article></div>
+      </section>
+      <div class="notes">For each issue, say what is broken, who it affects, and what a clean fix looks like.</div>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="shell">
+      <div class="split">
+        <section class="panel">
+          <div class="eyebrow">Side-by-side repair</div>
+          <h2 class="title">Observed on the left, fixed on the right.</h2>
+          <p class="lead">The compare page becomes the correction surface. It keeps the difference visible in one glance.</p>
+          <div class="compare-mini">
+            <article class="mini-compare">
+              <strong>Labels and instructions</strong>
+              <div class="mini-compare-grid">
+                <span class="mini-bad">Placeholder-only field</span>
+                <span class="mini-good">Visible label plus support hint</span>
+              </div>
+            </article>
+            <article class="mini-compare">
+              <strong>Keyboard and errors</strong>
+              <div class="mini-compare-grid">
+                <span class="mini-bad">Mouse-only card and vague error text</span>
+                <span class="mini-good">Real link, clear focus, specific recovery text</span>
+              </div>
+            </article>
+          </div>
+        </section>
+        <aside class="panel">
+          <div class="eyebrow">Open live view</div>
+          <div class="stack" style="margin-top:12px;">
+            <a class="page-card" href="./wcag_study_case_static_site/compare.html" target="_blank" rel="noreferrer">
+              <span class="page-step">Compare</span>
+              <strong>Open the repair view</strong>
+              <p>Use this during correction and discussion.</p>
+              <span class="page-link">Open compare page</span>
+            </a>
+            <a class="page-card" href="./wcag_study_case_static_site/answer-key.html" target="_blank" rel="noreferrer">
+              <span class="page-step">Key</span>
+              <strong>Open the repair key</strong>
+              <p>Use this as the short answer summary after discussion.</p>
+              <span class="page-link">Open answer key</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+      <div class="notes">Keep the compare page central. The answer key supports the conversation, but should not replace it.</div>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="shell">
+      <div class="cover">
+        <div>
+          <div class="eyebrow">Wrap-up</div>
+          <h2 class="display">Observe first, compare second, repair last.</h2>
+          <p class="lead">That sequence makes the study case feel connected to Task 1 and Task 2 without repeating them mechanically.</p>
+        </div>
+        <aside class="hero-card">
+          <div class="stack">
+            <a class="page-card" href="./wcag_study_case_static_site/index.html" target="_blank" rel="noreferrer">
+              <span class="page-step">Open site</span>
+              <strong>Start at the home page</strong>
+              <p>Begin with the observation pages.</p>
+              <span class="page-link">Open observation site</span>
+            </a>
+            <a class="page-card" href="./wcag_study_case_static_site/compare.html" target="_blank" rel="noreferrer">
+              <span class="page-step">Open compare</span>
+              <strong>Switch to side-by-side repair</strong>
+              <p>Move into correction and discussion.</p>
+              <span class="page-link">Open compare view</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+      <div class="notes">Close by repeating the order: observe, compare, repair. That keeps the study case flowing naturally.</div>
+    </div>
+  </section>
+  <div id="notesPanel" aria-live="polite"></div>
+  <div class="nav-bar">
+    <button class="nav" id="prev" type="button" aria-label="Previous slide">‹</button>
+    <div class="hud"><span class="eyebrow">Study case</span><div class="bar"><span></span></div><div class="count" id="counter">1/5</div></div>
+    <button class="nav" id="next" type="button" aria-label="Next slide">›</button>
+  </div>
+<script>
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const notesPanel = document.getElementById("notesPanel");
+  const prev = document.getElementById("prev");
+  const next = document.getElementById("next");
+  const counter = document.getElementById("counter");
+  const bar = document.querySelector(".bar span");
+  let index = 0;
+  let notesVisible = true;
+
+  function show(nextIndex) {
+    index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+    slides.forEach((slide, slideIndex) => slide.classList.toggle("active", slideIndex === index));
+    const notes = slides[index].querySelector(".notes");
+    notesPanel.innerHTML = notes ? `<h4>Speaker note</h4><p>${notes.textContent}</p>` : "";
+    notesPanel.classList.toggle("open", Boolean(notes) && notesVisible);
+    counter.textContent = `${index + 1}/${slides.length}`;
+    bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+  }
+
+  prev.addEventListener("click", () => show(index - 1));
+  next.addEventListener("click", () => show(index + 1));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") show(index - 1);
+    if (event.key === "ArrowRight" || event.key === " ") {
+      event.preventDefault();
+      show(index + 1);
+    }
+    if (event.key === "n" || event.key === "N") {
+      notesVisible = !notesVisible;
+      const notes = slides[index].querySelector(".notes");
+      notesPanel.classList.toggle("open", Boolean(notes) && notesVisible);
+    }
+    if (event.key === "Escape") notesPanel.classList.remove("open");
+  });
+
+  show(0);
+</script>
+</body>
+</html>

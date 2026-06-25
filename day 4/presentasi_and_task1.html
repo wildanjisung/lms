@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accessible Web Components - Live Presentation</title>
+<style>
+:root {
+  --bg: #f4f0e7;
+  --paper: #fffdf8;
+  --ink: #111827;
+  --muted: #536070;
+  --dark: #0f1420;
+  --dark2: #182033;
+  --line: #d8d0c2;
+  --blue: #2557d6;
+  --teal: #087f5b;
+  --coral: #d9480f;
+  --gold: #f5c542;
+  --shadow: 14px 16px 0 rgba(0,0,0,.92);
+  font-family: "Avenir Next", "SF Pro Display", "Segoe UI", "Noto Sans", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0b0f18; color: var(--ink); }
+body { display: grid; place-items: center; }
+button, input { font: inherit; }
+#deck {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow: 0 20px 70px rgba(0,0,0,.35);
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  padding: 54px;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(37, 87, 214, .10), transparent 24%),
+    linear-gradient(135deg, #f5f0e6, #f8f4eb);
+}
+.slide.active { display: block; animation: slideIn .55s cubic-bezier(.18,.84,.22,1) both; }
+.slide[data-theme="dark"] {
+  color: white;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(37,87,214,.18), transparent 24%),
+    linear-gradient(135deg, #0f1420, #111827 64%, #10141f);
+}
+.slide[data-theme="dark"]::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 18px; background: var(--gold); }
+.slide[data-theme="dark"]::after { content: ""; position: absolute; inset: 0 auto 0 18px; width: 7px; background: var(--blue); }
+@keyframes slideIn { from { opacity: 0; transform: translateY(18px) scale(.992); } to { opacity: 1; transform: none; } }
+.kicker { margin: 0 0 24px; color: var(--blue); font-size: 18px; font-weight: 900; letter-spacing: -.01em; }
+[data-theme="dark"] .kicker { color: #b6c1dc; }
+h1, h2, h3, p { margin: 0; }
+.mega { font-size: clamp(58px, 7vw, 98px); line-height: .9; letter-spacing: -.07em; font-weight: 950; }
+h2 { max-width: 640px; font-size: clamp(46px, 5.5vw, 82px); line-height: .92; letter-spacing: -.065em; font-weight: 950; }
+h3 { font-size: 29px; line-height: 1.05; letter-spacing: -.03em; }
+.lead, .deck-subtitle { margin-top: 28px; max-width: 520px; color: var(--muted); font-size: 24px; line-height: 1.25; }
+[data-theme="dark"] .lead, [data-theme="dark"] .deck-subtitle { color: #d8deea; }
+.tagline { display: inline-flex; margin-top: 44px; color: var(--gold); font-size: 28px; font-weight: 900; }
+.cover-grid, .split, .visual-first, .assignment-layout, .checklist-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 54px; height: 100%; align-items: center; }
+.cover-live { transform: rotate(1deg); }
+.control-board, .people-list, .component-cloud, .barrier-list, .prompt-list, .rubric { display: grid; gap: 18px; }
+.keyline, .people-list article, .barrier-list article, .prompt-list article, .rubric article {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.76);
+  border-radius: 22px;
+  padding: 22px 24px;
+}
+kbd { display: inline-flex; min-width: 108px; justify-content: center; margin-right: 18px; padding: 8px 14px; background: var(--dark); color: white; border-radius: 12px; font-weight: 900; }
+.keyline span { font-size: 22px; font-weight: 800; }
+.people-list article { position: relative; padding-left: 62px; }
+.people-list strong, .barrier-list b, .prompt-list b, .rubric b { font-size: 23px; }
+.people-list p, .barrier-list p, .rubric p { margin-top: 6px; color: var(--muted); font-size: 17px; line-height: 1.25; }
+.dot { position: absolute; left: 28px; top: 30px; width: 14px; height: 14px; border-radius: 999px; }
+.blue { background: var(--blue); } .teal { background: var(--teal); } .coral { background: var(--coral); }
+.blue-text { color: var(--blue); } .teal-text { color: var(--teal); } .coral-text { color: var(--coral); }
+.centerpiece { height: 100%; display: grid; align-content: center; justify-items: center; text-align: center; }
+.objective-row, .answer-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; width: min(760px, 100%); }
+.objective-row article, .answer-row article {
+  min-height: 170px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 26px;
+  text-align: left;
+}
+.objective-row span { color: var(--blue); font-size: 18px; font-weight: 950; }
+.objective-row h3 { margin-top: 14px; color: var(--ink); }
+.objective-row p, .answer-row p { margin-top: 12px; color: var(--muted); font-size: 18px; line-height: 1.25; }
+.expected {
+  margin-top: 42px;
+  padding: 22px 30px;
+  border-radius: 24px;
+  background: var(--dark);
+  color: white;
+  font-size: 24px;
+  font-weight: 900;
+}
+.expected.wide { max-width: 860px; }
+.compact { grid-template-columns: .8fr 1.2fr; }
+.component-cloud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.component-cloud article {
+  padding: 22px;
+  border-radius: 20px;
+  background: white;
+  border: 1px solid var(--line);
+}
+.component-cloud h3 { color: var(--blue); font-size: 26px; }
+.component-cloud p { margin-top: 6px; color: var(--muted); font-size: 17px; }
+.prompt { margin-top: 34px; color: var(--blue); font-size: 22px; line-height: 1.24; font-weight: 900; }
+.finding-stack { margin-top: 40px; display: grid; gap: 28px; max-width: 470px; }
+.finding-stack article { display: grid; grid-template-columns: 125px 1fr; align-items: start; }
+.finding-stack strong { font-size: 28px; }
+.finding-stack p { color: var(--ink); font-size: 25px; line-height: 1.16; }
+.live-panel { justify-self: stretch; }
+.live-demo {
+  border-radius: 30px;
+  padding: 26px;
+  background: white;
+  border: 1px solid #e5dfd4;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.cover-live .live-demo { transform: scale(.94); transform-origin: center; }
+.demo-topbar {
+  display: flex; align-items: center; gap: 8px; margin: -6px -4px 22px; color: var(--muted);
+  font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em;
+}
+.demo-topbar span { width: 12px; height: 12px; border-radius: 99px; background: #cbd5e1; }
+.demo-topbar b { margin-left: auto; }
+.compare-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+.bad-surface, .good-surface { border-radius: 22px; padding: 24px; border: 1px solid #d9e0ea; min-height: 210px; }
+.bad-surface { background: #fff1f2; }
+.good-surface { background: #ecfdf3; }
+.demo-label { margin-bottom: 18px; font-size: 17px; font-weight: 950; }
+.demo-label.bad { color: #dc2626; }
+.demo-label.good { color: #166534; }
+.demo-btn {
+  min-height: 56px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  padding: 0 24px;
+  font-size: 22px;
+  font-weight: 950;
+  cursor: pointer;
+}
+.demo-btn:focus-visible, .focus-controls *:focus-visible, .icon-button:focus-visible {
+  outline: 4px solid rgba(37,87,214,.55);
+  outline-offset: 4px;
+}
+.demo-btn.weak { background: #f8fafc; border-color: #e2e8f0; color: #94a3b8; }
+.demo-btn.strong { background: var(--dark); color: white; }
+.micro { margin-top: 16px; color: var(--muted); font-size: 15px; line-height: 1.3; }
+.live-output, .focus-status, .contrast-status, .announcement {
+  display: block;
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--dark);
+  color: white;
+  font-size: 18px;
+  font-weight: 850;
+}
+.demo-instruction { color: var(--muted); font-size: 19px; margin-bottom: 24px; }
+.focus-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.focus-controls button, .focus-controls input {
+  min-height: 66px;
+  border-radius: 16px;
+  border: 1.5px solid #cbd5e1;
+  background: white;
+  padding: 0 14px;
+  font-weight: 850;
+  color: var(--ink);
+}
+.focus-controls input { grid-column: span 1; min-width: 0; }
+.contrast-stage { display: grid; gap: 24px; }
+.contrast-sample {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  border: 1px solid #d9e0ea;
+  background: #f8fafc;
+  color: rgb(198, 207, 219);
+  transition: color .2s ease;
+}
+.contrast-sample span { font-size: 42px; font-weight: 950; letter-spacing: -.04em; }
+.slider-label { color: var(--muted); font-size: 18px; font-weight: 900; }
+.slider-label input { display: block; width: 100%; margin-top: 14px; accent-color: var(--blue); }
+.field-label { display: block; color: var(--ink); font-size: 17px; font-weight: 950; margin-bottom: 8px; }
+.email-live {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 14px;
+  border: 1.5px solid #cbd5e1;
+  padding: 0 16px;
+  font-size: 20px;
+}
+.validate-email { margin-top: 18px; }
+.error-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+.bad-error, .good-error {
+  display: grid;
+  align-content: center;
+  min-height: 88px;
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 17px;
+  font-weight: 850;
+}
+.bad-error { background: #fff1f2; color: #dc2626; }
+.good-error { background: #ecfdf3; color: var(--ink); border-left: 6px solid var(--teal); }
+.sr-buttons { display: flex; gap: 20px; align-items: center; }
+.icon-button {
+  width: 92px; height: 82px; border-radius: 22px; border: 1px solid #d9e0ea;
+  background: #fff1f2; color: var(--ink); font-size: 38px; font-weight: 950; cursor: pointer;
+}
+.icon-button.named { background: #ecfdf3; }
+.announce { margin-top: 40px; width: 330px; padding: 26px; border-radius: 24px; background: #eaf0ff; color: var(--ink); font-size: 27px; font-weight: 950; }
+.code-callout { margin-top: 22px; width: 440px; padding: 20px; border-radius: 18px; background: var(--dark); color: white; font-family: "SF Mono", Consolas, monospace; font-size: 19px; }
+.barrier-list article { border-left: 10px solid var(--blue); }
+.barrier-list article:nth-child(2) { border-left-color: var(--coral); }
+.barrier-list article:nth-child(3) { border-left-color: var(--teal); }
+.formula { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 24px; align-items: center; margin-top: 54px; width: min(900px, 100%); }
+.formula article { padding: 52px 24px; border-radius: 30px; background: white; border: 1px solid var(--line); }
+.formula strong { font-size: 44px; color: var(--blue); }
+.formula article:nth-of-type(2) strong { color: var(--coral); }
+.formula article:nth-of-type(3) strong { color: var(--teal); }
+.formula span { color: var(--line); font-size: 44px; font-weight: 950; }
+.assignment-layout { grid-template-columns: .58fr 1.42fr; }
+.assignment-layout h2, .checklist-layout h2 { color: white; font-size: 84px; }
+.assignment-copy {
+  max-height: 430px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(24,32,51,.92);
+  border: 1px solid #33405b;
+  color: #edf2ff;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.build-note { margin-top: 28px; max-width: 510px; color: #d8deea; font-size: 23px; line-height: 1.28; }
+.check-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 22px 42px; }
+.check-grid article { color: #a8b2c6; font-size: 24px; font-weight: 900; line-height: 1.08; }
+.check-grid article.visible { color: white; }
+.check-grid span { display: inline-block; min-width: 58px; margin-right: 14px; color: var(--gold); font-family: Georgia, serif; font-size: 34px; }
+.answer-row { width: 560px; align-self: center; }
+.answer-row article { min-height: 210px; }
+.answer-row b { color: var(--blue); font-size: 20px; }
+.answer-row article:nth-child(2) b { color: var(--coral); }
+.answer-row article:nth-child(3) b { color: var(--teal); }
+.prompt-list article { display: grid; grid-template-columns: 150px 1fr; align-items: center; padding: 16px 20px; }
+.prompt-list b { color: var(--blue); font-size: 18px; }
+.prompt-list span { color: var(--ink); font-size: 18px; }
+.rubric article { border-left: 10px solid var(--blue); }
+.rubric article:nth-child(2) { border-left-color: var(--coral); }
+.rubric article:nth-child(3) { border-left-color: var(--teal); }
+.references { height: 100%; display: grid; align-content: center; }
+.references h2 { color: white; }
+.references ul { margin: 40px 0 0; padding-left: 26px; color: #d8deea; font-size: 20px; line-height: 1.8; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .42s ease, transform .42s ease, filter .42s ease; filter: blur(4px); }
+.reveal.visible { opacity: 1; transform: none; filter: blur(0); }
+#hud { position: absolute; left: 28px; right: 28px; bottom: 20px; display: flex; align-items: center; gap: 18px; color: rgba(255,255,255,.72); z-index: 10; pointer-events: none; }
+#deck:not(.dark-active) #hud { color: #766f64; }
+#bar { flex: 1; height: 3px; background: rgba(128,128,128,.25); border-radius: 999px; overflow: hidden; }
+#bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .35s ease; }
+#counter { min-width: 56px; text-align: right; font-weight: 850; }
+#notesPanel {
+  position: absolute; right: 22px; bottom: 64px; width: min(520px, calc(100% - 44px));
+  padding: 22px 24px; border-radius: 22px; background: rgba(15,20,32,.92); color: white;
+  border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 70px rgba(0,0,0,.35);
+  z-index: 20; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .24s ease;
+}
+#notesPanel.open { opacity: 1; transform: none; pointer-events: auto; }
+#notesPanel h4 { margin: 0 0 10px; color: var(--gold); font-size: 16px; }
+#notesPanel p { color: #e7ecf5; font-size: 16px; line-height: 1.45; }
+.notes { display: none; }
+button.nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 12;
+  width: 42px; height: 72px; border: 0; border-radius: 18px; background: rgba(15,20,32,.14); color: white;
+  font-size: 30px; cursor: pointer; opacity: .18; transition: .2s ease;
+}
+button.nav:hover { opacity: .85; background: rgba(15,20,32,.45); }
+#prev { left: 16px; } #next { right: 16px; }
+#deck:not(.dark-active) button.nav { color: var(--ink); }
+@media (max-width: 760px) {
+  .slide { padding: 34px; }
+  .cover-grid, .split, .visual-first, .assignment-layout, .checklist-layout { grid-template-columns: 1fr; gap: 24px; }
+  h2 { font-size: 48px; }
+  .mega { font-size: 56px; }
+  .compare-grid, .check-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main id="deck" aria-live="polite">
+<section class="slide" data-title="Cover" data-theme="dark">
+      <div class="cover-grid">
+        <div>
+          <p class="kicker">Module 2, Day 4</p>
+          <h1 class="mega">Accessible<br />Web Components</h1>
+          <p class="deck-subtitle">Modern UI frameworks and accessible components according to WCAG 2.2.</p>
+          <div class="tagline">Live example edition</div>
+        </div>
+        <div class="cover-live">
+          
+  <div class="live-demo label-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live button labels</b></div>
+    <div class="compare-grid">
+      <section class="bad-surface">
+        <p class="demo-label bad">Less clear</p>
+        <button class="demo-btn weak" data-message="Action unclear: users still need to guess what happens.">Click here</button>
+        <p class="micro">The action is vague and easy to misread.</p>
+      </section>
+      <section class="good-surface">
+        <p class="demo-label good">Clearer</p>
+        <button class="demo-btn strong" data-message="Clear action: the form will be submitted.">Submit form</button>
+        <p class="micro">The label tells users exactly what happens next.</p>
+      </section>
+    </div>
+    <output class="live-output">Click one of the buttons.</output>
+  </div>
+        </div>
+      </div>
+      <aside class="notes">Open with the point that this deck contains live examples. The class can click, Tab, validate, and compare accessibility states directly inside the presentation.</aside>
+    </section>
+<section class="slide" data-title="How To Present" data-theme="light">
+      <div class="split">
+        <div>
+          <p class="kicker">Presentation mode</p>
+          <h2>Built for live explanation</h2>
+          <p class="lead">Use the deck like a teaching surface: reveal points, interact with examples, and show speaker notes when needed.</p>
+        </div>
+        <div class="control-board">
+          <div class="keyline" data-step="1"><kbd>Space</kbd><span>Reveal next point</span></div>
+          <div class="keyline" data-step="2"><kbd>Left / Right</kbd><span>Move slides</span></div>
+          <div class="keyline" data-step="3"><kbd>N</kbd><span>Toggle speaker notes</span></div>
+          <div class="keyline" data-step="4"><kbd>F</kbd><span>Fullscreen</span></div>
+        </div>
+      </div>
+      <aside class="notes">Space advances reveal points first, then moves to the next slide. The examples are real HTML controls, so they can be clicked and tested during explanation.</aside>
+    </section>
+<section class="slide" data-title="Accessibility Quality" data-theme="light">
+      <div class="split">
+        <div>
+          <p class="kicker">Accessibility</p>
+          <h2>Accessibility is product quality.</h2>
+          <p class="lead">An interface is not finished if people cannot perceive, understand, or operate it.</p>
+        </div>
+        <div class="people-list">
+          <article data-step="1"><span class="dot blue"></span><strong>Keyboard users</strong><p>Every control must be reachable without a mouse.</p></article>
+          <article data-step="2"><span class="dot teal"></span><strong>Screen reader users</strong><p>Controls need names, roles, labels, and structure.</p></article>
+          <article data-step="3"><span class="dot coral"></span><strong>Users with visual barriers</strong><p>Text needs readable contrast and non-color cues.</p></article>
+        </div>
+      </div>
+      <aside class="notes">Define accessibility in practical product terms. The goal is simple: more people can complete the task with less friction.</aside>
+    </section>
+<section class="slide" data-title="Objective" data-theme="light">
+      <div class="centerpiece">
+        <p class="kicker">Learning objective</p>
+        <h2>Review a UI and write useful feedback.</h2>
+        <div class="objective-row">
+          <article data-step="1"><span>01</span><h3>Spot</h3><p>Find visible barriers.</p></article>
+          <article data-step="2"><span>02</span><h3>Explain</h3><p>Name the user impact.</p></article>
+          <article data-step="3"><span>03</span><h3>Fix</h3><p>Suggest a simple improvement.</p></article>
+        </div>
+        <div class="expected" data-step="4">Expected output: barrier list + reasoning + improvement idea.</div>
+      </div>
+      <aside class="notes">Keep the outcome concrete. This is not a full formal audit. Learners should practice review thinking.</aside>
+    </section>
+<section class="slide" data-title="Components" data-theme="light">
+      <div class="split compact">
+        <div>
+          <p class="kicker">Components</p>
+          <h2>Components to Review</h2>
+          <p class="lead">Start by naming the UI parts before judging whether they are accessible.</p>
+          <p class="prompt" data-step="7">Prompt: Which component would block task completion first?</p>
+        </div>
+        <div class="component-cloud">
+          <article data-step="1"><h3>Buttons</h3><p>Action labels</p></article>
+          <article data-step="2"><h3>Links</h3><p>Destination</p></article>
+          <article data-step="3"><h3>Forms</h3><p>Labels and help</p></article>
+          <article data-step="4"><h3>Menus</h3><p>Reachability</p></article>
+          <article data-step="5"><h3>Icons</h3><p>Meaning</p></article>
+          <article data-step="6"><h3>Errors</h3><p>Recovery</p></article>
+        </div>
+      </div>
+      <aside class="notes">Ask learners to scan the interface first. If they cannot name the components, they will struggle to write precise findings.</aside>
+    </section>
+<section class="slide" data-title="Labels" data-theme="light">
+      <div class="visual-first">
+        <div>
+          <p class="kicker">Labels</p>
+          <h2>Clear labels reduce hesitation.</h2>
+          <div class="finding-stack">
+            <article data-step="1"><strong class="blue-text">Issue</strong><p>"Click here" is vague.</p></article>
+            <article data-step="2"><strong class="coral-text">Impact</strong><p>Users may not know what action will happen.</p></article>
+            <article data-step="3"><strong class="teal-text">Fix</strong><p>Use "Submit form" or another action-specific label.</p></article>
+          </div>
+        </div>
+        <div class="live-panel" data-step="1">
+  <div class="live-demo label-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live button labels</b></div>
+    <div class="compare-grid">
+      <section class="bad-surface">
+        <p class="demo-label bad">Less clear</p>
+        <button class="demo-btn weak" data-message="Action unclear: users still need to guess what happens.">Click here</button>
+        <p class="micro">The action is vague and easy to misread.</p>
+      </section>
+      <section class="good-surface">
+        <p class="demo-label good">Clearer</p>
+        <button class="demo-btn strong" data-message="Clear action: the form will be submitted.">Submit form</button>
+        <p class="micro">The label tells users exactly what happens next.</p>
+      </section>
+    </div>
+    <output class="live-output">Click one of the buttons.</output>
+  </div></div>
+      </div>
+      <aside class="notes">Click both buttons in the live example. Ask which one creates more confidence. Reference WCAG 3.3.2 Labels or Instructions.</aside>
+    </section>
+<section class="slide" data-title="Keyboard" data-theme="light">
+      <div class="visual-first">
+        <div>
+          <p class="kicker">Keyboard</p>
+          <h2>Keyboard use is operability.</h2>
+          <p class="lead">A user should be able to complete the flow without a mouse.</p>
+          <p class="prompt" data-step="1">Prompt: Click into the demo and press Tab.</p>
+        </div>
+        <div class="live-panel">
+  <div class="live-demo keyboard-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live keyboard flow</b></div>
+    <p class="demo-instruction">Click inside this demo, then press Tab.</p>
+    <div class="focus-controls">
+      <button data-focus-name="Menu">Menu</button>
+      <input data-focus-name="Email field" aria-label="Email field" value="mira@example.com" />
+      <button data-focus-name="Submit">Submit</button>
+      <button data-focus-name="Result">Result</button>
+    </div>
+    <output class="focus-status">Focus state will appear here.</output>
+  </div></div>
+      </div>
+      <aside class="notes">Have learners trace Tab order out loud. Ask what happens after each focus movement. Reference WCAG 2.1.1 Keyboard.</aside>
+    </section>
+<section class="slide" data-title="Contrast" data-theme="light">
+      <div class="visual-first">
+        <div>
+          <p class="kicker">Contrast</p>
+          <h2>Contrast decides whether text can be seen.</h2>
+          <div class="rule-box" data-step="1">
+            <strong>Rule of thumb</strong>
+            <span>Normal text: 4.5:1</span>
+            <span>Large text: 3:1</span>
+          </div>
+          <p class="prompt" data-step="2">Prompt: Drag the slider. When does the text become readable?</p>
+        </div>
+        <div class="live-panel">
+  <div class="live-demo contrast-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live contrast control</b></div>
+    <div class="contrast-stage">
+      <div class="contrast-sample">
+        <span>Confirm order</span>
+      </div>
+      <label class="slider-label">Increase text contrast
+        <input class="contrast-range" type="range" min="0" max="100" value="18" />
+      </label>
+      <output class="contrast-status">Weak contrast</output>
+    </div>
+  </div></div>
+      </div>
+      <aside class="notes">Use the slider to make visibility concrete. Learners should describe readability, not color preference. Reference WCAG 1.4.3 Contrast Minimum.</aside>
+    </section>
+<section class="slide" data-title="Errors" data-theme="light">
+      <div class="visual-first">
+        <div>
+          <p class="kicker">Error guidance</p>
+          <h2>Errors should help users recover.</h2>
+          <div class="recipe">
+            <article data-step="1"><span>01</span><strong>Identify</strong><p>Which field?</p></article>
+            <article data-step="2"><span>02</span><strong>Explain</strong><p>What is wrong?</p></article>
+            <article data-step="3"><span>03</span><strong>Guide</strong><p>How to fix it?</p></article>
+          </div>
+        </div>
+        <div class="live-panel">
+  <div class="live-demo error-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live form validation</b></div>
+    <label class="field-label" for="email-demo">Email</label>
+    <input id="email-demo" class="email-live" value="mira@" aria-describedby="email-help" />
+    <p id="email-help" class="micro">Try an incomplete email, then validate.</p>
+    <button class="demo-btn strong validate-email">Validate email</button>
+    <div class="error-columns">
+      <output class="bad-error">Invalid input</output>
+      <output class="good-error">Email is incomplete. Use the format name@example.com.</output>
+    </div>
+  </div></div>
+      </div>
+      <aside class="notes">Change the email field and click validate. Compare vague error text with helpful recovery guidance. Reference WCAG 3.3.1 Error Identification.</aside>
+    </section>
+<section class="slide" data-title="Screen Reader" data-theme="light">
+      <div class="visual-first">
+        <div>
+          <p class="kicker">Screen reader access</p>
+          <h2>Icon-only controls still need names.</h2>
+          <div class="announce" data-step="1">What would the screen reader announce?</div>
+          <div class="code-callout" data-step="2">&lt;button aria-label="Open main menu"&gt;</div>
+          <p class="prompt" data-step="3">Fix pattern: name + role + state.</p>
+        </div>
+        <div class="live-panel">
+  <div class="live-demo screenreader-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live announcement simulation</b></div>
+    <div class="sr-buttons">
+      <button class="icon-button" data-announce="button" aria-hidden="true">&#9776;</button>
+      <button class="icon-button named" data-announce="Open main menu, button" aria-label="Open main menu">&#9776;</button>
+    </div>
+    <p class="micro">Click each icon button to compare the announced name.</p>
+    <output class="announcement">Announcement will appear here.</output>
+  </div></div>
+      </div>
+      <aside class="notes">Click each icon button to simulate the announcement. Reference WCAG 4.1.2 Name, Role, Value.</aside>
+    </section>
+<section class="slide" data-title="Barriers" data-theme="light">
+      <div class="split">
+        <div>
+          <p class="kicker">Barrier patterns</p>
+          <h2>Common barriers repeat.</h2>
+          <p class="lead">Most beginner findings fit into three practical groups.</p>
+        </div>
+        <div class="barrier-list">
+          <article data-step="1"><b>Language</b><p>Unlabeled fields, vague links, unclear buttons.</p></article>
+          <article data-step="2"><b>Visibility</b><p>Low contrast, color-only states, icons with no meaning.</p></article>
+          <article data-step="3"><b>Operation</b><p>Keyboard skips, focus traps, weak guidance.</p></article>
+        </div>
+      </div>
+      <aside class="notes">Use categories to keep feedback structured. This prevents learners from writing random comments.</aside>
+    </section>
+<section class="slide" data-title="Formula" data-theme="light">
+      <div class="centerpiece">
+        <p class="kicker">Feedback formula</p>
+        <h2>Turn findings into fixes.</h2>
+        <div class="formula">
+          <article data-step="1"><strong>Issue</strong></article>
+          <span data-step="2">-&gt;</span>
+          <article data-step="2"><strong>Impact</strong></article>
+          <span data-step="3">-&gt;</span>
+          <article data-step="3"><strong>Fix</strong></article>
+        </div>
+        <div class="expected wide" data-step="4">Button label is vague -&gt; users hesitate -&gt; replace with "Submit form".</div>
+      </div>
+      <aside class="notes">Model one finding. The wording is short, but it still contains what was observed, why it matters, and what to change.</aside>
+    </section>
+<section class="slide" data-title="Task Assignment" data-theme="dark">
+      <div class="assignment-layout">
+        <div>
+          <p class="kicker">Task assignment</p>
+          <h2>Task Assignment</h2>
+          <p class="deck-subtitle">Original wording from the course plan.</p>
+        </div>
+        <pre class="assignment-copy">Task 1: Barriers in a Web interface identify
+The Participants consider a simple Web interface from Everyday perspective, to Example a Kontaktformular, a Login-Area, a Course registration, a Shopping cart or a Navigationsseite. The Task is without technical Prior knowledge solvable, because They from Nutzerperspektive begins.
+Assignment:
+1. Describe They, which Elements on the Interface visible are.
+2. Check They, whether the Elements understandably beschriftet are.
+3. Consider They, whether the Page without Mouse usable would be.
+4. Evaluate They, whether Farben and Contrasts sufficient clear seem.
+5. Check They, whether Error messages understandably would be.
+6. Name They Elements, the for Screenreader problematisch are could.
+7. Formulate They at least five possible Barriers.
+8. Describe They to each Barriere a simple Verbesserungsidee.
+Exemplary Barriers: Button without clear Designation, Formularfeld without Label, Error message only in Rot, to smaller Kontrast, relevant factor only per Mouse reachable, Linktext „here klicken“, unclear Order when relevant factor, missing Description when Symbolen.
+Objective the Task: The Participants identify, that digital accessibility already when simple relevant factor begins. They develop a first Understanding for this, how Design, Structure and Usability zusammenwirken.
+Expected Result: A Barrierenliste with Improvement proposals for Structure, understandability, Usability and visual Wahrnehmbarkeit.</pre>
+      </div>
+      <aside class="notes">This slide preserves the assignment wording as written in the course plan. Use it when introducing the task requirements.</aside>
+    </section>
+<section class="slide" data-title="Checklist" data-theme="dark">
+      <div class="checklist-layout">
+        <div>
+          <p class="kicker">Task flow</p>
+          <h2>Review in this order.</h2>
+          <p class="build-note">Reveal the checklist in groups while learners work.</p>
+        </div>
+        <div class="check-grid">
+          <article data-step="1"><span>01</span>List visible components</article>
+          <article data-step="1"><span>02</span>Check labels and guidance</article>
+          <article data-step="2"><span>03</span>Imagine keyboard-only use</article>
+          <article data-step="2"><span>04</span>Review color and contrast</article>
+          <article data-step="3"><span>05</span>Inspect error messages</article>
+          <article data-step="3"><span>06</span>Check screen-reader risk</article>
+          <article data-step="4"><span>07</span>Write at least 5 barriers</article>
+          <article data-step="4"><span>08</span>Suggest simple fixes</article>
+        </div>
+      </div>
+      <aside class="notes">Use this slide as the workshop checklist. Reveal two steps at a time so learners are not overwhelmed.</aside>
+    </section>
+<section class="slide" data-title="Example Answer" data-theme="light">
+      <div class="split compact">
+        <div>
+          <p class="kicker">Example finding</p>
+          <h2>Example finding</h2>
+          <p class="lead">A good answer is short, but still explains the barrier and the fix.</p>
+          <div class="expected" data-step="4">Pattern: issue -&gt; impact -&gt; realistic fix</div>
+        </div>
+        <div class="answer-row">
+          <article data-step="1"><b>Barrier</b><p>Button label says "Click here".</p></article>
+          <article data-step="2"><b>Why it matters</b><p>Users may not know what will happen.</p></article>
+          <article data-step="3"><b>Simple fix</b><p>Use a specific label: "Submit form".</p></article>
+        </div>
+      </div>
+      <aside class="notes">This slide calibrates quality. Learners should write precise findings, not long essays.</aside>
+    </section>
+<section class="slide" data-title="Questions" data-theme="light">
+      <div class="split">
+        <div>
+          <p class="kicker">Discussion questions</p>
+          <h2>Questions by review area</h2>
+          <p class="lead">Use these as quick prompts before writing findings.</p>
+        </div>
+        <div class="prompt-list">
+          <article data-step="1"><b>Labels</b><span>Does the label explain the action?</span></article>
+          <article data-step="2"><b>Keyboard</b><span>Can the flow be completed without a mouse?</span></article>
+          <article data-step="3"><b>Contrast</b><span>Is important text easy to read?</span></article>
+          <article data-step="4"><b>Errors</b><span>Does the message explain recovery?</span></article>
+          <article data-step="5"><b>Screen reader</b><span>What would assistive tech announce?</span></article>
+        </div>
+      </div>
+      <aside class="notes">If discussion slows down, assign one question per group and ask them to produce one finding from it.</aside>
+    </section>
+<section class="slide" data-title="Rubric" data-theme="light">
+      <div class="split">
+        <div>
+          <p class="kicker">Quality check</p>
+          <h2>What good looks like</h2>
+          <p class="lead">Use this as a quick rubric before learners submit.</p>
+        </div>
+        <div class="rubric">
+          <article data-step="1"><b>Specific</b><p>Names the exact component or text.</p></article>
+          <article data-step="2"><b>User-centered</b><p>Explains the impact on task completion.</p></article>
+          <article data-step="3"><b>Fixable</b><p>Suggests a realistic improvement.</p></article>
+        </div>
+      </div>
+      <aside class="notes">Use this slide to tighten vague answers. If a finding is not specific, user-centered, and fixable, ask learners to revise it.</aside>
+    </section>
+<section class="slide" data-title="References" data-theme="dark">
+      <div class="references">
+        <p class="kicker">References</p>
+        <h2>Source base</h2>
+        <ul>
+          <li>WCAG 2.2 SC 1.4.3 Contrast Minimum</li>
+          <li>WCAG 2.2 SC 2.1.1 Keyboard</li>
+          <li>WCAG 2.2 SC 3.3.1 Error Identification</li>
+          <li>WCAG 2.2 SC 3.3.2 Labels or Instructions</li>
+          <li>WCAG 2.2 SC 4.1.2 Name, Role, Value</li>
+          <li>shadcn/ui component documentation</li>
+        </ul>
+      </div>
+      <aside class="notes">Close by reminding learners that WCAG is a reference for product quality decisions, not a replacement for user-centered thinking.</aside>
+    </section>
+  <button class="nav" id="prev" aria-label="Previous slide">‹</button>
+  <button class="nav" id="next" aria-label="Next slide">›</button>
+  <div id="hud"><div id="bar"><span></span></div><div id="counter"></div></div>
+  <div id="notesPanel"><h4>Speaker notes</h4><p></p></div>
+</main>
+<script>
+const deck = document.querySelector("#deck");
+const slides = [...document.querySelectorAll(".slide")];
+const bar = document.querySelector("#bar span");
+const counter = document.querySelector("#counter");
+const notesPanel = document.querySelector("#notesPanel");
+const notesText = notesPanel.querySelector("p");
+let index = 0;
+let step = 0;
+
+slides.forEach((slide) => {
+  slide.querySelectorAll("[data-step]").forEach((el) => el.classList.add("reveal"));
+});
+
+function maxStep(slide) {
+  return Math.max(0, ...[...slide.querySelectorAll("[data-step]")].map((el) => Number(el.dataset.step || 0)));
+}
+
+function render() {
+  slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+  const current = slides[index];
+  deck.classList.toggle("dark-active", current.dataset.theme === "dark");
+  current.querySelectorAll("[data-step]").forEach((el) => {
+    el.classList.toggle("visible", Number(el.dataset.step || 0) <= step);
+  });
+  const note = current.querySelector(".notes")?.textContent?.trim() || "";
+  notesText.textContent = note;
+  bar.style.width = ((index + 1) / slides.length * 100).toFixed(2) + "%";
+  counter.textContent = String(index + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0");
+  document.title = (current.dataset.title || "Slide") + " - Accessible Web Components";
+}
+
+function next() {
+  const m = maxStep(slides[index]);
+  if (step < m) step += 1;
+  else if (index < slides.length - 1) { index += 1; step = 0; }
+  render();
+}
+
+function prev() {
+  if (step > 0) step -= 1;
+  else if (index > 0) { index -= 1; step = maxStep(slides[index]); }
+  render();
+}
+
+document.querySelector("#next").addEventListener("click", next);
+document.querySelector("#prev").addEventListener("click", prev);
+window.addEventListener("keydown", (event) => {
+  const active = document.activeElement;
+  const isEditing = active && ["INPUT", "TEXTAREA"].includes(active.tagName);
+  if (!isEditing && ["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
+  if (!isEditing && ["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
+  if (!isEditing && event.key.toLowerCase() === "n") notesPanel.classList.toggle("open");
+  if (!isEditing && event.key.toLowerCase() === "f") {
+    if (!document.fullscreenElement) deck.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+  if (!isEditing && event.key === "Home") { index = 0; step = 0; render(); }
+  if (!isEditing && event.key === "End") { index = slides.length - 1; step = maxStep(slides[index]); render(); }
+});
+
+document.querySelectorAll(".demo-btn[data-message]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const demo = button.closest(".live-demo");
+    const out = demo.querySelector(".live-output");
+    if (out) out.textContent = button.dataset.message;
+  });
+});
+
+document.querySelectorAll(".keyboard-demo").forEach((demo) => {
+  const status = demo.querySelector(".focus-status");
+  demo.querySelectorAll("[data-focus-name]").forEach((el, i) => {
+    el.addEventListener("focus", () => {
+      status.textContent = "Focus " + String(i + 1) + ": " + el.dataset.focusName;
+    });
+  });
+});
+
+function updateContrast(input) {
+  const demo = input.closest(".contrast-demo");
+  const sample = demo.querySelector(".contrast-sample");
+  const status = demo.querySelector(".contrast-status");
+  const value = Number(input.value);
+  const channel = Math.max(17, 205 - Math.round(value * 1.85));
+  sample.style.color = "rgb(" + channel + "," + channel + "," + channel + ")";
+  status.textContent = value < 35 ? "Weak contrast" : value < 70 ? "Getting better" : "Strong contrast";
+}
+document.querySelectorAll(".contrast-range").forEach((input) => {
+  input.addEventListener("input", () => updateContrast(input));
+  updateContrast(input);
+});
+
+document.querySelectorAll(".validate-email").forEach((button) => {
+  button.addEventListener("click", () => {
+    const demo = button.closest(".error-demo");
+    const input = demo.querySelector(".email-live");
+    const good = demo.querySelector(".good-error");
+    const bad = demo.querySelector(".bad-error");
+    const valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value);
+    bad.textContent = valid ? "No error" : "Invalid input";
+    good.textContent = valid ? "Looks valid. The user can continue." : "Email is incomplete. Use the format name@example.com.";
+  });
+});
+
+document.querySelectorAll(".screenreader-demo .icon-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    const demo = button.closest(".screenreader-demo");
+    demo.querySelector(".announcement").textContent = "Announced: " + button.dataset.announce;
+  });
+});
+
+let touchStartX = 0;
+window.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0].screenX; }, { passive: true });
+window.addEventListener("touchend", (event) => {
+  const dx = event.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(dx) > 48) (dx < 0 ? next : prev)();
+}, { passive: true });
+
+render();
+</script>
+</body>
+</html>

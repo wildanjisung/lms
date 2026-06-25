@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Northlight Weekend - Compare</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body data-page="compare">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">N</span>
+          <div>
+            <p class="brand-kicker">Northlight Weekend</p>
+            <h1 class="brand-name">Public event microsite</h1>
+          </div>
+        </div>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="index.html">Home</a><a href="program.html">Program</a><a href="tickets.html">Tickets</a><a href="venue.html">Venue</a><a href="compare.html" aria-current="page">Compare</a><a href="answer-key.html">Repair key</a>
+        </nav>
+      </header>
+      <div class="flow-strip" aria-label="Site flow">
+        <span class="flow-pill"><b>01</b>Home</span><span class="flow-pill"><b>02</b>Program</span><span class="flow-pill"><b>03</b>Tickets</span><span class="flow-pill"><b>04</b>Venue</span><span class="flow-pill is-active"><b>05</b>Compare</span><span class="flow-pill"><b>06</b>Repair key</span>
+      </div>
+      <main id="main">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Observation page 5</p>
+            <h2>The repair view places the broken and fixed versions side by side.</h2>
+            <p class="lead">This is the main correction page. It gives you a clean before/after comparison for the accessibility issues that appear on the observation pages.</p>
+          </div>
+          <aside class="hero-aside">
+            
+          </aside>
+        </section>
+        
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <p class="section-label">Side-by-side repair</p>
+          <h3>Observed vs fixed</h3>
+        </div>
+        <span class="section-chip">Discussion view</span>
+      </div>
+      <p class="lead">Use this page for correction and discussion. Each pair shows the observed version on the left and the corrected version on the right, with a short explanation underneath.</p>
+      <div class="meta-row" style="margin-top:18px;">
+        <span class="chip"><b>1</b> Labels</span>
+        <span class="chip"><b>2</b> Keyboard</span>
+        <span class="chip"><b>3</b> Contrast</span>
+        <span class="chip"><b>4</b> Semantics</span>
+        <span class="chip"><b>5</b> Errors</span>
+        <span class="chip"><b>6</b> Media</span>
+      </div>
+    </section><section class="compare-section" id="labels-search">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Labels and instructions</p>
+        <h3>Search field on Home</h3>
+      </div>
+      <span class="section-chip">Home</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="field">
+  <input class="input" type="search" placeholder="Search artists, talks, or venues" />
+</div></div>
+        <p>The search box relies on placeholder text only, so the purpose disappears as soon as the user types.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><div class="field">
+  <label class="field-label" for="search">Search artists, talks, or venues</label>
+  <input class="input" id="search" type="search" placeholder="Search artists, talks, or venues" />
+  <p class="field-hint">Try a topic, a speaker, or a venue.</p>
+</div></div>
+        <p>Add a visible label and keep the helper text outside the placeholder.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="keyboard-card">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Keyboard / operable</p>
+        <h3>Featured card on Home</h3>
+      </div>
+      <span class="section-chip">Home</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="promo-card mouse-only" data-href="program.html">
+  <span class="eyebrow">Featured</span>
+  <strong>Explore the weekend program</strong>
+  <p>See the talks, performances, and workshops.</p>
+</div></div>
+        <p>The feature card is only clickable with a pointer, so keyboard users cannot activate it.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><a class="promo-card" href="program.html">
+  <span class="eyebrow">Featured</span>
+  <strong>Explore the weekend program</strong>
+  <p>See the talks, performances, and workshops.</p>
+</a></div>
+        <p>Use a real link or button and keep a visible focus state.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="contrast-status">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Contrast</p>
+        <h3>Status text on Program</h3>
+      </div>
+      <span class="section-chip">Program</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="status-pill weak">Almost full</div></div>
+        <p>The status text is too light against the background, so it is harder to read.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><div class="status-pill strong">Almost full</div></div>
+        <p>Use sufficient contrast for text and badges.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="semantics-schedule">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Semantics</p>
+        <h3>Schedule grid on Program</h3>
+      </div>
+      <span class="section-chip">Program</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="schedule-grid">
+  <div class="session-card"><strong>10:00</strong><p>Main stage opening</p></div>
+  <div class="session-card"><strong>11:30</strong><p>Poster walk</p></div>
+  <div class="session-card"><strong>14:00</strong><p>Workshop hour</p></div>
+</div></div>
+        <p>The schedule is built from generic cards, so the relationships between time and session are not explicit.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><table class="schedule-table">
+  <thead>
+    <tr><th>Time</th><th>Session</th><th>Location</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>10:00</td><td>Main stage opening</td><td>Hall A</td></tr>
+    <tr><td>11:30</td><td>Poster walk</td><td>Gallery</td></tr>
+    <tr><td>14:00</td><td>Workshop hour</td><td>Studio 2</td></tr>
+  </tbody>
+</table></div>
+        <p>Use a semantic table or another structure with clear headers and rows.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="labels-email">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Labels and instructions</p>
+        <h3>Email field on Tickets</h3>
+      </div>
+      <span class="section-chip">Tickets</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="field">
+  <input class="input" type="email" placeholder="Email address" />
+</div></div>
+        <p>The email field uses placeholder text only, which makes the instruction brittle and easy to miss.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><div class="field">
+  <label class="field-label" for="email">Email address</label>
+  <input class="input" id="email" type="email" placeholder="name@example.com" />
+  <p class="field-hint">We send the ticket confirmation here.</p>
+</div></div>
+        <p>Add a visible label and a short support hint below the field.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="errors-message">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Error identification</p>
+        <h3>Validation message on Tickets</h3>
+      </div>
+      <span class="section-chip">Tickets</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="error-box bad">Invalid input</div></div>
+        <p>The error copy is vague and leans on color alone instead of explaining the exact problem.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><div class="error-box good" id="email-error">Email is incomplete. Use name@example.com.</div></div>
+        <p>Name the failing field and say what format or value is expected.</p>
+      </article>
+    </div>
+  </section><section class="compare-section" id="media-alternatives">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Media / text alternatives</p>
+        <h3>Media block on Venue</h3>
+      </div>
+      <span class="section-chip">Venue</span>
+    </div>
+    <div class="compare-grid">
+      <article class="compare-card broken">
+        <span class="compare-tag">Observed</span>
+        <div class="compare-ui"><div class="media-card">
+  <button class="play-button" type="button" aria-hidden="true">▶</button>
+  <img src="data:image/svg+xml;charset=UTF-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221200%22%20height%3D%22800%22%20viewBox%3D%220%200%201200%20800%22%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ddd6fe%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23818cf8%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%221200%22%20height%3D%22800%22%20rx%3D%2248%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22970%22%20cy%3D%22190%22%20r%3D%22118%22%20fill%3D%22rgba(255%2C255%2C255%2C0.22)%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22230%22%20cy%3D%22630%22%20r%3D%22186%22%20fill%3D%22rgba(255%2C255%2C255%2C0.12)%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2290%22%20y%3D%22176%22%20fill%3D%22%230f172a%22%20font-size%3D%2256%22%20font-weight%3D%22800%22%20font-family%3D%22Aptos%2C%20Segoe%20UI%2C%20sans-serif%22%3EVenue%20preview%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2290%22%20y%3D%22248%22%20fill%3D%22%230f172a%22%20font-size%3D%2234%22%20font-weight%3D%22600%22%20font-family%3D%22Aptos%2C%20Segoe%20UI%2C%20sans-serif%22%3ENo%20transcript%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E" alt="" />
+  <p class="media-note">A short highlight reel plays here.</p>
+</div></div>
+        <p>The media card lacks captions, transcript access, and meaningful alternative text for the event images.</p>
+      </article>
+      <article class="compare-card fixed">
+        <span class="compare-tag good">Fixed</span>
+        <div class="compare-ui"><div class="media-card">
+  <button class="play-button" type="button" aria-label="Play highlight reel">▶</button>
+  <img src="data:image/svg+xml;charset=UTF-8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221200%22%20height%3D%22800%22%20viewBox%3D%220%200%201200%20800%22%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23dcfce7%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%2334d399%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%221200%22%20height%3D%22800%22%20rx%3D%2248%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22970%22%20cy%3D%22190%22%20r%3D%22118%22%20fill%3D%22rgba(255%2C255%2C255%2C0.22)%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22230%22%20cy%3D%22630%22%20r%3D%22186%22%20fill%3D%22rgba(255%2C255%2C255%2C0.12)%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2290%22%20y%3D%22176%22%20fill%3D%22%230f172a%22%20font-size%3D%2256%22%20font-weight%3D%22800%22%20font-family%3D%22Aptos%2C%20Segoe%20UI%2C%20sans-serif%22%3EVenue%20preview%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2290%22%20y%3D%22248%22%20fill%3D%22%230f172a%22%20font-size%3D%2234%22%20font-weight%3D%22600%22%20font-family%3D%22Aptos%2C%20Segoe%20UI%2C%20sans-serif%22%3ESeating%20and%20stage%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E" alt="Main hall seating and stage lighting" />
+  <p class="media-note">Captions available. <a href="#">Read transcript</a>.</p>
+</div></div>
+        <p>Provide alt text, captions, and a transcript link beside the player.</p>
+      </article>
+    </div>
+  </section>
+      </main>
+      <footer class="page-footer">
+        <div class="footer-note">The compare view is the dedicated correction surface.</div>
+        <div class="footer-nav" aria-label="Site navigation">
+          <a class="nav-button ghost" href="venue.html"><span>Back</span><strong>Venue</strong></a>
+          <a class="nav-button solid" href="answer-key.html"><span>Next</span><strong>Repair key</strong></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

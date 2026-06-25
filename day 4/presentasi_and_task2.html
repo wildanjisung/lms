@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accessible Web Components - Task 2 Live Edition</title>
+<style>
+:root {
+  --bg: #f4f0e7;
+  --paper: #fffdf8;
+  --ink: #111827;
+  --muted: #536070;
+  --dark: #0f1420;
+  --dark2: #182033;
+  --line: #d8d0c2;
+  --blue: #2557d6;
+  --teal: #087f5b;
+  --coral: #d9480f;
+  --gold: #f5c542;
+  --shadow: 14px 16px 0 rgba(0,0,0,.92);
+  font-family: "Avenir Next", "SF Pro Display", "Segoe UI", "Noto Sans", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0b0f18; color: var(--ink); }
+body { display: grid; place-items: center; }
+button, input { font: inherit; }
+#deck {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow: 0 20px 70px rgba(0,0,0,.35);
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  padding: 54px;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(37, 87, 214, .10), transparent 24%),
+    linear-gradient(135deg, #f5f0e6, #f8f4eb);
+}
+.slide.active { display: block; animation: slideIn .55s cubic-bezier(.18,.84,.22,1) both; }
+.slide[data-theme="dark"] {
+  color: white;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(37,87,214,.18), transparent 24%),
+    linear-gradient(135deg, #0f1420, #111827 64%, #10141f);
+}
+.slide[data-theme="dark"]::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 18px; background: var(--gold); }
+.slide[data-theme="dark"]::after { content: ""; position: absolute; inset: 0 auto 0 18px; width: 7px; background: var(--blue); }
+@keyframes slideIn { from { opacity: 0; transform: translateY(18px) scale(.992); } to { opacity: 1; transform: none; } }
+.kicker { margin: 0 0 24px; color: var(--blue); font-size: 18px; font-weight: 900; letter-spacing: -.01em; }
+[data-theme="dark"] .kicker { color: #b6c1dc; }
+h1, h2, h3, p { margin: 0; }
+.mega { font-size: clamp(58px, 7vw, 98px); line-height: .9; letter-spacing: -.07em; font-weight: 950; }
+h2 { max-width: 680px; font-size: clamp(44px, 5.25vw, 78px); line-height: .93; letter-spacing: -.065em; font-weight: 950; }
+h3 { font-size: 29px; line-height: 1.05; letter-spacing: -.03em; }
+.lead, .deck-subtitle { margin-top: 28px; max-width: 540px; color: var(--muted); font-size: 23px; line-height: 1.26; }
+[data-theme="dark"] .lead, [data-theme="dark"] .deck-subtitle { color: #d8deea; }
+.cover-grid, .split, .visual-first, .assignment-layout, .centerpiece { display: grid; grid-template-columns: .96fr 1.04fr; gap: 54px; height: 100%; align-items: center; }
+.cover-grid {
+  grid-template-columns: 1fr .98fr;
+}
+[data-title="Cover"] {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(37,87,214,.12), transparent 24%),
+    radial-gradient(circle at 84% 18%, rgba(8,127,91,.10), transparent 22%),
+    linear-gradient(135deg, #f8f4eb, #f3eee4);
+}
+[data-title="Cover"] .cover-grid { align-items: center; }
+.cover-chips {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.cover-chips span {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.82);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 850;
+  box-shadow: 0 10px 0 rgba(15,20,32,.05);
+}
+.session-flow {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 500px;
+}
+.session-flow div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.84);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 0 rgba(15,20,32,.05);
+}
+.session-flow span {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(37,87,214,.10);
+  color: var(--blue);
+  font-size: 15px;
+  font-weight: 900;
+}
+.cover-side {
+  justify-self: end;
+  width: min(520px, 100%);
+  padding: 26px;
+  border-radius: 34px;
+  background: rgba(255,255,255,.76);
+  border: 1px solid var(--line);
+  box-shadow: 0 22px 0 rgba(15,20,32,.06);
+}
+.cover-side-label {
+  margin: 0 0 16px;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.priority-ladder { display: grid; gap: 14px; }
+.ladder-card {
+  min-height: 132px;
+  padding: 20px 22px;
+  border-radius: 24px;
+  background: white;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 0 rgba(15,20,32,.05);
+}
+.ladder-card span {
+  display: inline-flex;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+.ladder-card.p1 span { background: rgba(217,72,15,.18); color: #ffb39b; }
+.ladder-card.p2 span { background: rgba(37,87,214,.18); color: #d2ddff; }
+.ladder-card.p3 span { background: rgba(8,127,91,.18); color: #bbf3dc; }
+.ladder-card strong { display: block; font-size: 26px; margin-bottom: 6px; color: var(--ink); }
+.ladder-card p { color: var(--muted); font-size: 17px; line-height: 1.25; }
+.section-header { max-width: 760px; }
+.bridge-layout { grid-template-columns: .85fr 1.15fr; }
+.bridge-layout { align-items: start; }
+.bridge-layout h2 { font-size: clamp(38px, 4.7vw, 62px); max-width: 610px; }
+.bridge-layout .lead { font-size: 20px; margin-top: 22px; max-width: 520px; }
+.bridge-stack, .insight-grid, .logic-board, .criteria-row, .lens-grid, .question-grid { display: grid; gap: 18px; }
+.bridge-stack { gap: 14px; margin-top: 6px; }
+.bridge-stack article, .insight-card, .logic-board article, .criteria-row article, .lens-grid article, .question-grid article {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.76);
+  border-radius: 22px;
+  padding: 20px 22px;
+}
+.bridge-stack article { display: grid; grid-template-columns: 54px 1fr; gap: 12px; align-items: start; padding: 18px 20px; }
+.bridge-stack article span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: var(--dark);
+  color: white;
+  font-size: 16px;
+  font-weight: 900;
+}
+.bridge-stack article strong, .insight-card b, .logic-board strong, .criteria-row b, .lens-grid b, .question-grid b { font-size: 22px; }
+.bridge-stack article p, .insight-card p, .logic-board p, .criteria-row p, .lens-grid p, .question-grid p { margin-top: 8px; color: var(--muted); font-size: 17px; line-height: 1.28; }
+.bridge-stack article strong { font-size: 20px; }
+.bridge-stack article p { font-size: 15px; line-height: 1.24; }
+.insight-grid { grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 36px; }
+.insight-card { min-height: 190px; display: grid; align-content: start; }
+.insight-card b { color: var(--blue); }
+.callout-wide {
+  margin-top: 28px;
+  padding: 22px 30px;
+  border-radius: 22px;
+  background: var(--dark);
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+}
+.logic-layout { grid-template-columns: .82fr 1.18fr; }
+.logic-board article {
+  position: relative;
+  padding-left: 92px;
+  min-height: 130px;
+}
+.priority-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .03em;
+}
+.priority-pill.p1 { background: rgba(217,72,15,.16); color: var(--coral); }
+.priority-pill.p2 { background: rgba(37,87,214,.12); color: var(--blue); }
+.priority-pill.p3 { background: rgba(8,127,91,.14); color: var(--teal); }
+.logic-board .priority-pill { position: absolute; left: 22px; top: 22px; }
+.criteria-row { grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: 26px; }
+.lens-grid { grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 34px; }
+.criteria-row article, .lens-grid article, .question-grid article { min-height: 134px; }
+.component-cloud { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; margin-top: 36px; }
+.map-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: white;
+  border: 1px solid var(--line);
+  min-height: 156px;
+  display: grid;
+  gap: 12px;
+}
+.map-card h3 { color: var(--ink); font-size: 24px; }
+.map-card p, .map-tone { color: var(--muted); font-size: 16px; line-height: 1.25; }
+.map-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.map-card.p1 { border-left: 8px solid var(--coral); }
+.map-card.p2 { border-left: 8px solid var(--blue); }
+.map-card.p3 { border-left: 8px solid var(--teal); }
+.map-note {
+  margin-top: 24px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(15,20,32,.94);
+  color: white;
+  font-size: 18px;
+  font-weight: 850;
+}
+.priority-slide { grid-template-columns: .88fr 1.12fr; }
+.prompt-line {
+  margin-top: 32px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(37,87,214,.12);
+  color: var(--blue);
+  font-size: 20px;
+  font-weight: 900;
+}
+.live-panel { justify-self: stretch; }
+.live-demo {
+  border-radius: 30px;
+  padding: 26px;
+  background: white;
+  border: 1px solid #e5dfd4;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.demo-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -6px -4px 22px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.demo-topbar span { width: 12px; height: 12px; border-radius: 99px; background: #cbd5e1; }
+.demo-topbar b { margin-left: auto; }
+.priority-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 18px; }
+.priority-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; align-content: start; }
+.priority-card {
+  min-height: 110px;
+  border-radius: 20px;
+  border: 1px solid #d9e0ea;
+  background: #fffdf8;
+  padding: 16px 16px 14px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.priority-card strong { color: var(--ink); font-size: 21px; line-height: 1.06; }
+.priority-card span { color: var(--muted); font-size: 14px; line-height: 1.2; }
+.priority-card.selected {
+  border-color: rgba(37,87,214,.58);
+  box-shadow: 0 14px 30px rgba(37,87,214,.12);
+  transform: translateY(-2px);
+}
+.priority-card:focus-visible, .priority-card:hover {
+  outline: 3px solid rgba(37,87,214,.25);
+  outline-offset: 2px;
+}
+.priority-panel {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  border-radius: 24px;
+  background: var(--dark);
+  color: white;
+  padding: 24px;
+  min-height: 430px;
+}
+.panel-kicker {
+  color: #b9c6e4;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 900;
+}
+.priority-badge {
+  display: inline-flex;
+  width: max-content;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(245,197,66,.18);
+  color: #ffd966;
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: .03em;
+}
+.priority-name { font-size: 34px; letter-spacing: -.04em; }
+.priority-reason { color: #d8deea; font-size: 18px; line-height: 1.35; }
+.priority-meta { display: grid; gap: 12px; }
+.priority-meta div {
+  border-radius: 18px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  padding: 14px 16px;
+}
+.priority-meta span {
+  display: block;
+  margin-bottom: 6px;
+  color: #a8b2c6;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 900;
+}
+.priority-meta strong { font-size: 16px; line-height: 1.35; }
+.priority-note {
+  margin-top: 2px;
+  color: #d8deea;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.study-case-layout {
+  display: grid;
+  grid-template-columns: .92fr 1.08fr;
+  align-items: start;
+  gap: 22px;
+}
+.study-case-layout h2 {
+  color: var(--ink);
+  font-size: clamp(38px, 4.5vw, 64px);
+  line-height: .94;
+  max-width: 660px;
+}
+.study-case-layout .lead {
+  margin-top: 10px;
+  max-width: 560px;
+}
+.study-case-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.study-case-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid #d8e0ea;
+  background: white;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+.study-case-tab span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(37,87,214,.10);
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 950;
+}
+.study-case-tab.selected {
+  border-color: rgba(37,87,214,.45);
+  box-shadow: 0 12px 28px rgba(37,87,214,.10);
+  background: #fbfdff;
+  transform: translateY(-1px);
+}
+.study-case-tab:hover, .study-case-tab:focus-visible {
+  outline: 3px solid rgba(37,87,214,.22);
+  outline-offset: 2px;
+}
+.study-case-code-shell {
+  margin-top: 12px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #0f172a;
+  border: 1px solid rgba(15,23,42,.14);
+  box-shadow: 0 22px 44px rgba(15,23,42,.12);
+}
+.study-case-code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(148,163,184,.18);
+  background: rgba(15,23,42,.82);
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.study-case-code-label { color: #93c5fd; }
+.study-case-code {
+  margin: 0;
+  padding: 14px 18px 16px;
+  max-height: 96px;
+  overflow: auto;
+  white-space: pre-wrap;
+  color: #e2e8f0;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.42;
+}
+.study-case-demo { justify-self: stretch; }
+.study-case-preview {
+  display: grid;
+  gap: 10px;
+  border-radius: 30px;
+  padding: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #dfe7f1;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.study-preview-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.study-case-title { color: var(--ink); font-size: 28px; letter-spacing: -.04em; }
+.study-case-summary { margin-top: 6px; color: var(--muted); font-size: 15px; line-height: 1.3; max-width: 420px; }
+.study-case-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.study-case-wcag {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(37,87,214,.10);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.study-case-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(217,72,15,.12);
+  color: var(--coral);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: .03em;
+}
+.study-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.study-field,
+.study-submit,
+.study-status {
+  transition: opacity .18s ease, transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.study-field {
+  min-height: 78px;
+  display: grid;
+  gap: 7px;
+  padding: 9px 11px;
+  border-radius: 20px;
+  background: white;
+  border: 1px solid #dbe3ee;
+}
+.study-field[data-study-target~="upload"],
+.study-field[data-study-target~="keyboard"] {
+  grid-column: 1 / -1;
+}
+.study-field label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.study-input {
+  border-radius: 14px;
+  background: #f8fbff;
+  border: 1px solid #d5deea;
+  padding: 10px 12px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.study-input.error {
+  background: rgba(217,72,15,.08);
+  border-color: rgba(217,72,15,.22);
+  color: #9a3412;
+}
+.study-input.upload {
+  background: rgba(8,127,91,.08);
+  border-color: rgba(8,127,91,.18);
+  color: #047857;
+}
+.study-help,
+.study-error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.study-help { color: var(--muted); }
+.study-error { color: var(--coral); font-weight: 700; }
+.study-checkbox {
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px dashed #cad5e2;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.study-submit,
+.study-status {
+  border-radius: 18px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.study-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.study-actions .study-submit,
+.study-actions .study-status {
+  grid-column: auto;
+}
+.study-submit {
+  background: #111827;
+  color: white;
+}
+.study-status {
+  background: rgba(37,87,214,.10);
+  border: 1px solid rgba(37,87,214,.18);
+  color: var(--blue);
+}
+.study-field.active,
+.study-submit.active,
+.study-status.active {
+  opacity: 1;
+  transform: translateY(-1px);
+  border-color: rgba(37,87,214,.40);
+  box-shadow: 0 12px 24px rgba(37,87,214,.10);
+}
+.study-field.dimmed,
+.study-submit.dimmed,
+.study-status.dimmed {
+  opacity: .34;
+}
+.study-answer-strip {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(8,127,91,.10);
+  border: 1px solid rgba(8,127,91,.18);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 850;
+}
+.compact-output { grid-template-columns: .86fr 1.14fr; }
+.expected-lite {
+  margin-top: 32px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: var(--dark);
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+}
+.answer-stack {
+  display: grid;
+  gap: 14px;
+  align-self: center;
+}
+.answer-stack article {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: white;
+}
+.answer-stack b { color: var(--blue); font-size: 20px; }
+.answer-stack article:nth-child(2) b { color: var(--coral); }
+.answer-stack article:nth-child(3) b { color: var(--teal); }
+.answer-stack p { color: var(--muted); font-size: 17px; line-height: 1.3; }
+.assignment-layout { grid-template-columns: .78fr 1.22fr; align-items: start; }
+.assignment-layout h2 { color: var(--ink); font-size: clamp(44px, 5vw, 74px); max-width: 500px; }
+.assignment-layout .lead { max-width: 460px; }
+.assignment-copy {
+  max-height: 470px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 26px 28px;
+  border-radius: 28px;
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  box-shadow: 0 18px 0 rgba(15,20,32,.08);
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.48;
+}
+.questions-layout { grid-template-columns: .74fr 1.26fr; align-items: start; }
+.questions-layout h2 { max-width: 540px; font-size: clamp(42px, 4.8vw, 68px); }
+.questions-layout .lead { max-width: 480px; }
+  .question-grid {
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  margin-top: 4px;
+  padding: 22px;
+  border-radius: 30px;
+  background: white;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 0 rgba(15,20,32,.08);
+}
+.question-grid article {
+  position: relative;
+  min-height: 130px;
+  padding: 18px 18px 18px 68px;
+  background: white;
+  border-color: var(--line);
+}
+.question-grid article:last-child { grid-column: 1 / -1; }
+.question-grid article::before {
+  content: "0" attr(data-step);
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(37,87,214,.10);
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .04em;
+}
+.question-grid b { color: var(--ink); font-size: 19px; }
+.question-grid p { font-size: 15px; line-height: 1.25; color: var(--muted); }
+[data-title="Questions"] .question-board, [data-title="References"] .reference-board {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+[data-title="Questions"] .question-board {
+  transform: translateY(-16px);
+  padding-bottom: 12px;
+}
+.question-board-head, .reference-board-head { max-width: 780px; }
+.question-board-grid { margin-top: 0; }
+.question-strip, .reference-strip {
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(37,87,214,.10);
+  border: 1px solid rgba(37,87,214,.18);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+}
+.reference-strip {
+  background: rgba(8,127,91,.10);
+  border-color: rgba(8,127,91,.18);
+}
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.reference-grid article {
+  min-height: 132px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 12px 0 rgba(15,20,32,.05);
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.reference-grid b { color: var(--blue); font-size: 18px; }
+.reference-grid p { color: var(--muted); font-size: 15px; line-height: 1.3; }
+.study-package-board {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+.study-package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.study-package-grid article {
+  min-height: 140px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 14px 0 rgba(15,20,32,.05);
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.study-package-grid b { color: var(--blue); font-size: 18px; }
+.study-package-grid p {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 800;
+  word-break: break-word;
+}
+.study-package-strip {
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(37,87,214,.10);
+  border: 1px solid rgba(37,87,214,.18);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+}
+[data-theme="light"] .questions-layout .kicker { color: var(--blue); }
+[data-theme="light"] .questions-layout h2 { color: var(--ink); }
+[data-theme="light"] .questions-layout .lead { color: var(--muted); }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .42s ease, transform .42s ease, filter .42s ease; filter: blur(4px); }
+.reveal.visible { opacity: 1; transform: none; filter: blur(0); }
+#hud { position: absolute; left: 28px; right: 28px; bottom: 20px; display: flex; align-items: center; gap: 18px; color: rgba(255,255,255,.72); z-index: 10; pointer-events: none; }
+#deck:not(.dark-active) #hud { color: #766f64; }
+#bar { flex: 1; height: 3px; background: rgba(128,128,128,.25); border-radius: 999px; overflow: hidden; }
+#bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .35s ease; }
+#counter { min-width: 56px; text-align: right; font-weight: 850; }
+#notesPanel {
+  position: absolute; right: 22px; bottom: 64px; width: min(520px, calc(100% - 44px));
+  padding: 22px 24px; border-radius: 22px; background: rgba(15,20,32,.92); color: white;
+  border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 70px rgba(0,0,0,.35);
+  z-index: 20; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .24s ease;
+}
+#notesPanel.open { opacity: 1; transform: none; pointer-events: auto; }
+#notesPanel h4 { margin: 0 0 10px; color: var(--gold); font-size: 16px; }
+#notesPanel p { color: #e7ecf5; font-size: 16px; line-height: 1.45; }
+.notes { display: none; }
+button.nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 12;
+  width: 42px; height: 72px; border: 0; border-radius: 18px; background: rgba(15,20,32,.14); color: white;
+  font-size: 30px; cursor: pointer; opacity: .18; transition: .2s ease;
+}
+button.nav:hover { opacity: .85; background: rgba(15,20,32,.45); }
+#prev { left: 16px; } #next { right: 16px; }
+#deck:not(.dark-active) button.nav { color: var(--ink); }
+@media (max-width: 760px) {
+  .slide { padding: 34px; }
+  .cover-grid, .split, .visual-first, .assignment-layout, .centerpiece, .references-layout { grid-template-columns: 1fr; gap: 24px; }
+  h2 { font-size: 48px; }
+  .mega { font-size: 56px; }
+  .insight-grid, .criteria-row, .component-cloud, .question-grid, .priority-grid, .questions-layout, .question-board-grid, .reference-grid { grid-template-columns: 1fr; }
+  .priority-list { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<main id="deck" aria-live="polite">
+<section class="slide" data-title="Cover" data-theme="light">
+      <div class="cover-grid">
+        <div>
+          <p class="kicker">Module 2, Day 4</p>
+          <h1 class="mega">Accessible<br />Web Components</h1>
+          <p class="deck-subtitle">Task 2 live edition. From barrier detection to prioritization.</p>
+          <div class="cover-chips">
+            <span>WCAG 2.2</span>
+            <span>Accessible components</span>
+            <span>Priority decisions</span>
+          </div>
+          <div class="session-flow">
+            <div><span>1</span>Recall the barriers</div>
+            <div><span>2</span>Rank the components</div>
+            <div><span>3</span>Choose the first fixes</div>
+            <div><span>4</span>Write the rationale</div>
+          </div>
+        </div>
+        <div class="cover-side">
+          <p class="cover-side-label">Priority ladder</p>
+          <div class="priority-ladder">
+            <article class="ladder-card p1">
+              <span>P1</span>
+              <strong>Blockers first</strong>
+              <p>Login and assignment flow.</p>
+            </article>
+            <article class="ladder-card p2">
+              <span>P2</span>
+              <strong>High-frequency next</strong>
+              <p>Search, filters, and overview.</p>
+            </article>
+            <article class="ladder-card p3">
+              <span>P3</span>
+              <strong>Supportive last</strong>
+              <p>Progress, messages, downloads.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">Open by connecting Task 1 and Task 2. Task 1 found barriers; Task 2 chooses the order. Keep the tone practical and decision-oriented.</aside>
+    </section>
+<section class="slide" data-title="Bridge" data-theme="light">
+      <div class="split bridge-layout">
+        <div>
+          <p class="kicker">Bridge</p>
+          <h2>Task 1 found the problem. Task 2 chooses the order.</h2>
+          <p class="lead">We already know what is broken. Now we decide what to fix first and why that order makes sense.</p>
+        </div>
+        <div class="bridge-stack">
+          <article data-step="1">
+            <span>01</span>
+            <strong>Name the component</strong>
+            <p>What part of the course platform are we reviewing?</p>
+          </article>
+          <article data-step="2">
+            <span>02</span>
+            <strong>Judge the impact</strong>
+            <p>Does it block access, slow a common task, or only support the flow?</p>
+          </article>
+          <article data-step="3">
+            <span>03</span>
+            <strong>Pick the first fixes</strong>
+            <p>Choose the top three components and explain the order.</p>
+          </article>
+        </div>
+      </div>
+      <aside class="notes">Make the transition explicit. This is not a new accessibility area; it is the next step after barrier finding.</aside>
+    </section>
+<section class="slide" data-title="Why Priority Matters" data-theme="light">
+      <div class="section-header">
+        <p class="kicker">Why priority matters</p>
+        <h2>Not every issue has the same impact.</h2>
+        <p class="lead">Some problems block access. Others are important but less urgent. The order matters because time and budget are limited.</p>
+      </div>
+      <div class="insight-grid">
+        <article class="insight-card" data-step="1">
+          <b>Blockers first</b>
+          <p>If a user cannot log in or submit work, the task fails immediately.</p>
+        </article>
+        <article class="insight-card" data-step="2">
+          <b>Frequent paths next</b>
+          <p>Search, filters, and overview screens are used repeatedly and affect many users.</p>
+        </article>
+        <article class="insight-card" data-step="3">
+          <b>Supportive items last</b>
+          <p>Progress, messages, and downloads still matter, but they rarely block access by themselves.</p>
+        </article>
+      </div>
+      <div class="callout-wide" data-step="4">All issues still matter. Priority only decides the order of the work.</div>
+      <aside class="notes">Explain that prioritization is a risk-reduction tool. It does not excuse remaining issues; it simply organizes the fix sequence.</aside>
+    </section>
+<section class="slide" data-title="Decision Logic" data-theme="light">
+      <div class="split logic-layout">
+        <div>
+          <p class="kicker">Decision logic</p>
+          <h2>Use risk, frequency, and reach to rank components.</h2>
+          <p class="lead">A component becomes more urgent when it blocks the core flow, appears often, or affects many screens at once.</p>
+        </div>
+        <div class="logic-board">
+          <article data-step="1">
+            <span class="priority-pill p1">P1</span>
+            <strong>Blocks access or the core task</strong>
+            <p>Fix first when the user cannot proceed without it.</p>
+          </article>
+          <article data-step="2">
+            <span class="priority-pill p2">P2</span>
+            <strong>Used often or drives navigation</strong>
+            <p>Improve early when the component appears in many daily paths.</p>
+          </article>
+          <article data-step="3">
+            <span class="priority-pill p3">P3</span>
+            <strong>Supports status or secondary tasks</strong>
+            <p>Still important, but usually after the main flow is stable.</p>
+          </article>
+        </div>
+      </div>
+      <div class="criteria-row">
+        <article data-step="4"><b>Structure</b><p>Is the component organized clearly?</p></article>
+        <article data-step="4"><b>Labels</b><p>Does the wording explain the action?</p></article>
+        <article data-step="4"><b>Keyboard</b><p>Can the component be used without a mouse?</p></article>
+        <article data-step="4"><b>Contrast</b><p>Can users read and recognize it easily?</p></article>
+      </div>
+      <aside class="notes">Use these rules to rank the examples. The aim is not to guess a perfect answer, but to defend a sensible order.</aside>
+    </section>
+<section class="slide" data-title="Platform Map" data-theme="light">
+      <div class="section-header">
+        <p class="kicker">Scenario map</p>
+        <h2>The course platform is a shared flow, not a random list.</h2>
+        <p class="lead">Start by mapping the components, then decide which ones deserve the first improvement cycle.</p>
+      </div>
+      <div class="component-cloud map-cloud">
+        
+  <article class="map-card p1" data-step="1">
+    <div class="map-row">
+      <span class="priority-pill p1">P1</span>
+      <span class="map-tone">Blocker</span>
+    </div>
+    <h3>Login</h3>
+    <p>Access gate</p>
+  </article>
+
+  <article class="map-card p1" data-step="1">
+    <div class="map-row">
+      <span class="priority-pill p1">P1</span>
+      <span class="map-tone">Core flow</span>
+    </div>
+    <h3>Assignment form</h3>
+    <p>Core task</p>
+  </article>
+
+  <article class="map-card p2" data-step="2">
+    <div class="map-row">
+      <span class="priority-pill p2">P2</span>
+      <span class="map-tone">Frequent</span>
+    </div>
+    <h3>Search</h3>
+    <p>High-use control</p>
+  </article>
+
+  <article class="map-card p2" data-step="2">
+    <div class="map-row">
+      <span class="priority-pill p2">P2</span>
+      <span class="map-tone">Frequent</span>
+    </div>
+    <h3>Filters</h3>
+    <p>High-use control</p>
+  </article>
+
+  <article class="map-card p2" data-step="2">
+    <div class="map-row">
+      <span class="priority-pill p2">P2</span>
+      <span class="map-tone">Hub</span>
+    </div>
+    <h3>Course overview</h3>
+    <p>Navigation hub</p>
+  </article>
+
+  <article class="map-card p3" data-step="3">
+    <div class="map-row">
+      <span class="priority-pill p3">P3</span>
+      <span class="map-tone">Status</span>
+    </div>
+    <h3>Progress indicator</h3>
+    <p>Status feedback</p>
+  </article>
+
+  <article class="map-card p3" data-step="3">
+    <div class="map-row">
+      <span class="priority-pill p3">P3</span>
+      <span class="map-tone">Support</span>
+    </div>
+    <h3>Instructor messages</h3>
+    <p>Feedback area</p>
+  </article>
+
+  <article class="map-card p3" data-step="3">
+    <div class="map-row">
+      <span class="priority-pill p3">P3</span>
+      <span class="map-tone">Support</span>
+    </div>
+    <h3>Download area</h3>
+    <p>Supporting area</p>
+  </article>
+
+      </div>
+      <div class="map-note" data-step="4">The exact rank can change if analytics, support tickets, or user testing show a different risk.</div>
+      <aside class="notes">This slide sets the stage for the live demo. The map is a starting point, not a fixed answer.</aside>
+    </section>
+<section class="slide" data-title="Live Priority Board" data-theme="light">
+      <div class="visual-first priority-slide">
+        <div>
+          <p class="kicker">Live example</p>
+          <h2>Click a component to see why it comes first.</h2>
+          <p class="lead">The live board turns the ranking into a simple decision tool. Ask learners to defend the order, not just pick a badge.</p>
+          <div class="prompt-line" data-step="1">Prompt: Which component blocks access first?</div>
+        </div>
+        <div class="live-panel">
+  <div class="live-demo priority-demo">
+    <div class="demo-topbar"><span></span><span></span><span></span><b>Live priority board</b></div>
+    <div class="priority-grid">
+      <div class="priority-list" role="list" aria-label="Course platform components">
+        
+  <button class="priority-card selected" data-component="login" type="button">
+    <span class="priority-pill p1">P1</span>
+    <strong>Login</strong>
+    <span>Access gate</span>
+  </button>
+
+  <button class="priority-card " data-component="assignment" type="button">
+    <span class="priority-pill p1">P1</span>
+    <strong>Assignment form</strong>
+    <span>Core task</span>
+  </button>
+
+  <button class="priority-card " data-component="search" type="button">
+    <span class="priority-pill p2">P2</span>
+    <strong>Search</strong>
+    <span>High-use control</span>
+  </button>
+
+  <button class="priority-card " data-component="filters" type="button">
+    <span class="priority-pill p2">P2</span>
+    <strong>Filters</strong>
+    <span>High-use control</span>
+  </button>
+
+  <button class="priority-card " data-component="overview" type="button">
+    <span class="priority-pill p2">P2</span>
+    <strong>Course overview</strong>
+    <span>Navigation hub</span>
+  </button>
+
+  <button class="priority-card " data-component="progress" type="button">
+    <span class="priority-pill p3">P3</span>
+    <strong>Progress indicator</strong>
+    <span>Status feedback</span>
+  </button>
+
+  <button class="priority-card " data-component="messages" type="button">
+    <span class="priority-pill p3">P3</span>
+    <strong>Instructor messages</strong>
+    <span>Feedback area</span>
+  </button>
+
+  <button class="priority-card " data-component="download" type="button">
+    <span class="priority-pill p3">P3</span>
+    <strong>Download area</strong>
+    <span>Supporting area</span>
+  </button>
+
+      </div>
+      <div class="priority-panel" aria-live="polite">
+        <p class="panel-kicker">Selected component</p>
+        <div class="priority-badge">P1</div>
+        <h3 class="priority-name">Login</h3>
+        <p class="priority-reason">If login fails, the user cannot enter the platform at all.</p>
+        <div class="priority-meta">
+          <div><span>First fix</span><strong>Clear labels, visible focus, and recovery-friendly errors.</strong></div>
+          <div><span>WCAG lens</span><strong>Labels, keyboard, error identification.</strong></div>
+          <div><span>Still missing</span><strong>Common login errors and keyboard test results.</strong></div>
+        </div>
+        <p class="priority-note">Click a component to switch the reasoning.</p>
+      </div>
+    </div>
+  </div></div>
+      </div>
+      <aside class="notes">Use the live board to compare choices. Ask which component is a blocker, which one is used most, and what information is still missing.</aside>
+    </section>
+<section class="slide" data-title="WCAG Lens" data-theme="light">
+      <div class="section-header">
+        <p class="kicker">WCAG lens</p>
+        <h2>Check each component before you rank it.</h2>
+        <p class="lead">If the component fails the core review, it moves up the list.</p>
+      </div>
+      <div class="lens-grid">
+        <article data-step="1"><b>Structure</b><p>Does the layout and hierarchy make sense?</p></article>
+        <article data-step="2"><b>Labels</b><p>Do names and instructions explain the action?</p></article>
+        <article data-step="3"><b>Keyboard</b><p>Can users reach and operate it without a mouse?</p></article>
+        <article data-step="4"><b>Contrast</b><p>Can the content be read and recognized clearly?</p></article>
+        <article data-step="5"><b>Error feedback</b><p>Does the component help users recover from mistakes?</p></article>
+        <article data-step="6"><b>Understandability</b><p>Will the user know what happens next?</p></article>
+      </div>
+      <aside class="notes">This is the WCAG check before prioritization. We are not judging style; we are judging whether the component supports use.</aside>
+    </section>
+<section class="slide" data-title="Expected Output" data-theme="light">
+      <div class="split compact-output">
+        <div>
+          <p class="kicker">Expected output</p>
+          <h2>A priority list, short reasoning, and missing information.</h2>
+          <p class="lead">The answer should be brief, but each choice must be defensible.</p>
+          <div class="expected-lite" data-step="4">Top 3 components + short reasoning + missing information.</div>
+        </div>
+        <div class="answer-stack">
+          <article data-step="1"><b>1. Login</b><p>P1 because it blocks access.</p></article>
+          <article data-step="2"><b>2. Assignment form</b><p>P1 because it blocks task submission.</p></article>
+          <article data-step="3"><b>3. Search or filters</b><p>P2 because they are used often and shape navigation.</p></article>
+        </div>
+      </div>
+      <aside class="notes">Push learners to keep the rationale compact: component, priority, why, and what evidence is still missing.</aside>
+    </section>
+<section class="slide" data-title="Task Assignment" data-theme="light">
+      <div class="assignment-layout">
+        <div>
+          <p class="kicker">Task assignment</p>
+          <h2>Task Assignment</h2>
+          <p class="lead">Use the priority logic from the previous slides.</p>
+        </div>
+        <pre class="assignment-copy">Task 2: Prioritize accessible components
+Participants receive a scenario for a digital course platform. The platform contains Login, Course overview, Search, Filters, Progress indicator, Assignment form, Instructor messages, and a Download area.
+
+Assignment:
+1. List the most important web components on the platform.
+2. Evaluate which components are especially barrier-sensitive.
+3. Check each component using structure, labels, keyboard operation, contrast, error messages, and understandability.
+4. Prioritize the components according to risk and frequency of use.
+5. Decide which three components should be improved first.
+6. Justify the prioritization from user, quality, and risk perspectives.
+7. Name the information still missing for a safe evaluation.
+
+Objective:
+Participants practice treating accessibility as a prioritizable quality and risk area. They learn to make meaningful improvement decisions under limited time and budget.
+
+Expected output:
+A prioritized component list, short reasoning, and missing information.</pre>
+      </div>
+      <aside class="notes">This is the task brief. Let the earlier slides do the teaching, then use this slide as the practical handoff.</aside>
+    </section>
+<section class="slide" data-title="Study Case Package" data-theme="light">
+      <div class="study-package-board">
+        <div class="section-header">
+          <p class="kicker">Separate materials</p>
+          <h2>The study case is delivered in its own presentation.</h2>
+          <p class="lead">Keep Task 2 focused on prioritization. Open the companion deck and code file when you want the worked example.</p>
+        </div>
+        <div class="study-package-grid">
+          <article>
+            <b>Presentation</b>
+            <p>wcag_study_case_interactive_presentation.html</p>
+          </article>
+          <article>
+            <b>Code file</b>
+            <p>studycase_registration_flow_code.txt</p>
+          </article>
+        </div>
+        <div class="study-package-strip">Task 2 ends here by design. The full case study stays separate so the learning flow stays clean.</div>
+      </div>
+      <aside class="notes">Use this slide to point learners to the separate study case deck and code file.</aside>
+    </section>
+<section class="slide" data-title="Questions" data-theme="light">
+      <div class="question-board">
+        <div class="section-header question-board-head">
+          <p class="kicker">Discussion prompts</p>
+          <h2>Ask these questions before finalizing the order.</h2>
+          <p class="lead">The right question often makes the priority obvious.</p>
+        </div>
+        <div class="question-strip" data-step="1">Use one question at a time. Rank by risk, frequency, and missing evidence.</div>
+        <div class="question-grid question-board-grid">
+          
+  <article data-step="1">
+    <span>01</span>
+    <div>
+      <b>Blocks access?</b>
+      <p>Which component can stop the user immediately?</p>
+    </div>
+  </article>
+
+  <article data-step="2">
+    <span>02</span>
+    <div>
+      <b>Used often?</b>
+      <p>Which component appears in the main daily flow?</p>
+    </div>
+  </article>
+
+  <article data-step="3">
+    <span>03</span>
+    <div>
+      <b>Shared widely?</b>
+      <p>Which component affects many screens or pages?</p>
+    </div>
+  </article>
+
+  <article data-step="4">
+    <span>04</span>
+    <div>
+      <b>Status or feedback?</b>
+      <p>Which component helps users understand what happened?</p>
+    </div>
+  </article>
+
+  <article data-step="5">
+    <span>05</span>
+    <div>
+      <b>Missing evidence?</b>
+      <p>What data would make the ranking safer?</p>
+    </div>
+  </article>
+
+        </div>
+      </div>
+      <aside class="notes">Use one question per group if discussion slows down. Ask for a one-sentence answer, then ask them to defend it.</aside>
+    </section>
+<section class="slide" data-title="References" data-theme="light">
+      <div class="reference-board">
+        <div class="section-header reference-board-head">
+          <p class="kicker">Reference base</p>
+          <h2>Source checkpoints</h2>
+          <p class="lead">These are the core checks used across the deck to judge whether a component is accessible and worth prioritizing.</p>
+        </div>
+        <div class="reference-grid">
+          
+  <article>
+    <b>Contrast</b>
+    <p>WCAG 2.2 SC 1.4.3 Contrast Minimum</p>
+  </article>
+
+  <article>
+    <b>Keyboard</b>
+    <p>WCAG 2.2 SC 2.1.1 Keyboard</p>
+  </article>
+
+  <article>
+    <b>Errors</b>
+    <p>WCAG 2.2 SC 3.3.1 Error Identification</p>
+  </article>
+
+  <article>
+    <b>Instructions</b>
+    <p>WCAG 2.2 SC 3.3.2 Labels or Instructions</p>
+  </article>
+
+  <article>
+    <b>Semantics</b>
+    <p>WCAG 2.2 SC 4.1.2 Name, Role, Value</p>
+  </article>
+
+  <article>
+    <b>Clarity</b>
+    <p>Clean component design patterns inspired by shadcn-style clarity</p>
+  </article>
+
+        </div>
+        <div class="reference-strip">Accessibility decisions should be justified by user impact and evidence.</div>
+      </div>
+      <aside class="notes">Close by reminding learners that accessibility is a product-quality decision. Prioritization helps teams make the first good move without losing sight of the rest.</aside>
+    </section>
+  <button class="nav" id="prev" aria-label="Previous slide">‹</button>
+  <button class="nav" id="next" aria-label="Next slide">›</button>
+  <div id="hud"><div id="bar"><span></span></div><div id="counter"></div></div>
+  <div id="notesPanel"><h4>Speaker notes</h4><p></p></div>
+</main>
+<script>
+const deck = document.querySelector("#deck");
+const slides = [...document.querySelectorAll(".slide")];
+const bar = document.querySelector("#bar span");
+const counter = document.querySelector("#counter");
+const notesPanel = document.querySelector("#notesPanel");
+const notesText = notesPanel.querySelector("p");
+const studyCaseData = {"labels":{"title":"Visible labels","priority":"P1","kind":"HTML","wcag":"WCAG 3.3.2 Labels or Instructions","summary":"Every field must say what it is before input starts.","code":"\u003cform class=\"register-form\">\n  \u003cdiv class=\"field\">\n    \u003clabel for=\"course\">Course\u003c/label>\n    \u003cselect id=\"course\" name=\"course\" aria-describedby=\"course-help\">\n      \u003coption>Accessible Web Components\u003c/option>\n    \u003c/select>\n    \u003cp id=\"course-help\">Choose one course to register for.\u003c/p>\n  \u003c/div>\n  \u003cdiv class=\"field\">\n    \u003clabel for=\"full-name\">Full name\u003c/label>\n    \u003cinput id=\"full-name\" name=\"fullName\" type=\"text\" />\n  \u003c/div>\n\u003c/form>","targets":["labels"],"answer":"Start with the registration form because labels are the first barrier."},"errors":{"title":"Inline errors","priority":"P1","kind":"HTML","wcag":"WCAG 3.3.1 Error Identification","summary":"Users need a clear error message at the exact field.","code":"\u003clabel for=\"email\">Email\u003c/label>\n\u003cinput id=\"email\" type=\"email\" aria-invalid=\"true\" aria-describedby=\"email-error\" />\n\u003cp id=\"email-error\">Please enter a valid email address.\u003c/p>\n\u003cbutton type=\"submit\">Register now\u003c/button>","targets":["errors"],"answer":"Next fix error feedback so users know how to recover from mistakes."},"keyboard":{"title":"Keyboard access","priority":"P2","kind":"CSS","wcag":"WCAG 2.1.1 Keyboard","summary":"The flow must work without a mouse and show a visible focus state.","code":"button:focus-visible,\ninput:focus-visible,\nselect:focus-visible {\n  outline: 3px solid #2557d6;\n  outline-offset: 3px;\n}","targets":["keyboard","contrast"],"answer":"Protect keyboard users with clear focus and predictable tab order."},"contrast":{"title":"Readable contrast","priority":"P2","kind":"CSS","wcag":"WCAG 1.4.3 Contrast Minimum","summary":"Text, buttons, and status messages must stay easy to read.","code":".submit-button {\n  background: #111827;\n  color: #ffffff;\n  border: 1px solid #111827;\n}","targets":["contrast"],"answer":"Use sufficient contrast for buttons, text, and feedback messages."},"upload":{"title":"Accessible upload","priority":"P2","kind":"HTML","wcag":"WCAG 3.3.2 Labels or Instructions","summary":"File upload needs a label, support text, and keyboard access.","code":"\u003clabel for=\"files\">Upload assignment\u003c/label>\n\u003cinput id=\"files\" type=\"file\" accept=\".pdf,.png,.jpg\" />\n\u003cp>Accepted file types: PDF, PNG, JPG.\u003c/p>","targets":["upload"],"answer":"Then improve file upload because it is a common accessibility blocker."}};
+
+let index = 0;
+let step = 0;
+let currentComponent = "login";
+let currentStudyFocus = "labels";
+
+const componentProfiles = {
+  login: {
+    priority: "P1",
+    title: "Login",
+    reason: "If login fails, the user cannot enter the platform at all.",
+    fix: "Clear labels, visible focus, and recovery-friendly errors.",
+    lens: "Labels, keyboard, error identification.",
+    missing: "Common login errors and keyboard test results.",
+    tone: "Blocker",
+  },
+  assignment: {
+    priority: "P1",
+    title: "Assignment form",
+    reason: "This is the main learning action. If the form is unclear, the task cannot be completed.",
+    fix: "Labels, instructions, validation, and an accessible submit button.",
+    lens: "Labels, keyboard, error identification.",
+    missing: "Required fields, validation rules, and submit feedback.",
+    tone: "Core flow",
+  },
+  search: {
+    priority: "P2",
+    title: "Search",
+    reason: "Used often for navigation, but usually not a total blocker.",
+    fix: "Descriptive label, clear focus state, and results feedback.",
+    lens: "Labels, keyboard, structure.",
+    missing: "Search frequency and failure patterns.",
+    tone: "Frequent",
+  },
+  filters: {
+    priority: "P2",
+    title: "Filters",
+    reason: "Filters often shape the whole experience, especially in large course lists.",
+    fix: "Clear selected states, contrast, and keyboard operation.",
+    lens: "Structure, contrast, keyboard.",
+    missing: "Most-used filter combinations.",
+    tone: "Frequent",
+  },
+  overview: {
+    priority: "P2",
+    title: "Course overview",
+    reason: "The overview helps users orient themselves and find the next step.",
+    fix: "Heading hierarchy, readable structure, and logical focus order.",
+    lens: "Structure, labels, keyboard.",
+    missing: "Which elements users rely on most.",
+    tone: "Hub",
+  },
+  progress: {
+    priority: "P3",
+    title: "Progress indicator",
+    reason: "Useful feedback, but usually not a blocker for access.",
+    fix: "Text plus visual signal, not color alone.",
+    lens: "Contrast, name-role-value.",
+    missing: "Whether progress unlocks later actions.",
+    tone: "Status",
+  },
+  messages: {
+    priority: "P3",
+    title: "Instructor messages",
+    reason: "Important for communication, but secondary to the core flow.",
+    fix: "Readable hierarchy and announced updates.",
+    lens: "Structure, name-role-value.",
+    missing: "How often messages update in real use.",
+    tone: "Support",
+  },
+  download: {
+    priority: "P3",
+    title: "Download area",
+    reason: "Helpful resource area, but usually after the main task is complete.",
+    fix: "Descriptive link text, file type, and size.",
+    lens: "Links, labels, contrast.",
+    missing: "Which file types are downloaded most.",
+    tone: "Support",
+  },
+};
+
+slides.forEach((slide) => {
+  slide.querySelectorAll("[data-step]").forEach((el) => el.classList.add("reveal"));
+});
+
+function maxStep(slide) {
+  return Math.max(0, ...[...slide.querySelectorAll("[data-step]")].map((el) => Number(el.dataset.step || 0)));
+}
+
+function renderPriority(componentId) {
+  currentComponent = componentId;
+  const profile = componentProfiles[componentId];
+  const panel = document.querySelector(".priority-panel");
+  if (!panel || !profile) return;
+
+  document.querySelectorAll(".priority-card").forEach((card) => {
+    card.classList.toggle("selected", card.dataset.component === componentId);
+  });
+
+  panel.querySelector(".priority-badge").textContent = profile.priority;
+  panel.querySelector(".priority-name").textContent = profile.title;
+  panel.querySelector(".priority-reason").textContent = profile.reason;
+  panel.querySelectorAll(".priority-meta div")[0].querySelector("strong").textContent = profile.fix;
+  panel.querySelectorAll(".priority-meta div")[1].querySelector("strong").textContent = profile.lens;
+  panel.querySelectorAll(".priority-meta div")[2].querySelector("strong").textContent = profile.missing;
+}
+
+function renderStudyCase(focusId = currentStudyFocus) {
+  if (studyCaseData[focusId]) currentStudyFocus = focusId;
+  const slide = document.querySelector('[data-title="Study Case"]');
+  const data = studyCaseData[currentStudyFocus];
+  if (!slide || !data) return;
+
+  slide.querySelectorAll(".study-case-tab").forEach((button) => {
+    const active = button.dataset.studyFocus === currentStudyFocus;
+    button.classList.toggle("selected", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  slide.querySelector(".study-case-title").textContent = data.title;
+  slide.querySelector(".study-case-summary").textContent = data.summary;
+  slide.querySelector(".study-case-wcag").textContent = data.wcag;
+  slide.querySelector(".study-case-pill").textContent = data.priority;
+  slide.querySelector(".study-case-code-label").textContent = data.kind;
+  slide.querySelector(".study-case-code").textContent = data.code;
+  slide.querySelector(".study-answer-strip").textContent = "Suggested order: 1. Registration form  2. Error feedback  3. File upload";
+
+  slide.querySelectorAll("[data-study-target]").forEach((element) => {
+    const targets = (element.dataset.studyTarget || "").split(/s+/).filter(Boolean);
+    const active = targets.includes(currentStudyFocus);
+    element.classList.toggle("active", active);
+    element.classList.toggle("dimmed", !active);
+  });
+}
+
+function render() {
+  slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+  const current = slides[index];
+  deck.classList.toggle("dark-active", current.dataset.theme === "dark");
+
+  current.querySelectorAll("[data-step]").forEach((el) => {
+    el.classList.toggle("visible", Number(el.dataset.step || 0) <= step);
+  });
+
+  const note = current.querySelector(".notes")?.textContent?.trim() || "";
+  notesText.textContent = note;
+  bar.style.width = (((index + 1) / slides.length) * 100).toFixed(2) + "%";
+  counter.textContent = String(index + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0");
+  document.title = (current.dataset.title || "Slide") + " - Accessible Web Components";
+  if (document.querySelector(".priority-panel")) renderPriority(currentComponent);
+  if (current.dataset.title === "Study Case") renderStudyCase(currentStudyFocus);
+}
+
+function next() {
+  const m = maxStep(slides[index]);
+  if (step < m) step += 1;
+  else if (index < slides.length - 1) { index += 1; step = 0; }
+  render();
+}
+
+function prev() {
+  if (step > 0) step -= 1;
+  else if (index > 0) { index -= 1; step = maxStep(slides[index]); }
+  render();
+}
+
+document.querySelector("#next").addEventListener("click", next);
+document.querySelector("#prev").addEventListener("click", prev);
+
+window.addEventListener("keydown", (event) => {
+  const active = document.activeElement;
+  const isEditing = active && ["INPUT", "TEXTAREA"].includes(active.tagName);
+  if (!isEditing && ["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
+  if (!isEditing && ["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
+  if (!isEditing && event.key.toLowerCase() === "n") notesPanel.classList.toggle("open");
+  if (!isEditing && event.key.toLowerCase() === "f") {
+    if (!document.fullscreenElement) deck.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+  if (!isEditing && event.key === "Home") { index = 0; step = 0; render(); }
+  if (!isEditing && event.key === "End") { index = slides.length - 1; step = maxStep(slides[index]); render(); }
+});
+
+document.querySelectorAll(".priority-card").forEach((card) => {
+  card.addEventListener("click", () => renderPriority(card.dataset.component));
+});
+
+document.querySelectorAll(".study-case-tab").forEach((button) => {
+  button.addEventListener("click", () => renderStudyCase(button.dataset.studyFocus));
+});
+
+let touchStartX = 0;
+window.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0].screenX; }, { passive: true });
+window.addEventListener("touchend", (event) => {
+  const dx = event.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(dx) > 48) (dx < 0 ? next : prev)();
+}, { passive: true });
+
+render();
+</script>
+</body>
+</html>
