@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Static File Navigator</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --panel: rgba(255, 255, 255, 0.82);
+        --ink: #162033;
+        --muted: #5d6676;
+        --accent: #1f4dd1;
+        --border: rgba(22, 32, 51, 0.12);
+        --shadow: 0 24px 70px rgba(22, 32, 51, 0.12);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(31, 77, 209, 0.12), transparent 35%),
+          radial-gradient(circle at top right, rgba(10, 129, 93, 0.10), transparent 30%),
+          var(--bg);
+      }
+      a { color: inherit; text-decoration: none; }
+      .shell {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px 22px 24px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,255,255,0.38));
+        backdrop-filter: blur(14px);
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 52px);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+      }
+      .lead { margin: 10px 0 0; color: var(--muted); max-width: 64ch; }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(31, 77, 209, 0.10);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      main { padding-top: 16px; }
+      .section-title {
+        margin: 0 0 14px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .group {
+        margin-bottom: 18px;
+      }
+      .group-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .group-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+      .group-toggle:focus-visible {
+        outline: 2px solid rgba(31, 77, 209, 0.45);
+        outline-offset: 4px;
+        border-radius: 10px;
+      }
+      .chevron {
+        flex: 0 0 auto;
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(31, 77, 209, 0.08);
+        color: var(--accent);
+        transition: transform 0.18s ease;
+      }
+      .chevron.open { transform: rotate(90deg); }
+      .group-title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .group-title h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.03em;
+      }
+      .group-title p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .task-group {
+        margin-top: 12px;
+      }
+      .task-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: baseline;
+        margin: 0 0 8px;
+        padding: 0 4px;
+      }
+      .task-head h3 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: -0.02em;
+      }
+      .task-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .table-wrap {
+        overflow: auto;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 14px 28px rgba(22, 32, 51, 0.06);
+      }
+      .empty-panel {
+        padding: 16px 14px;
+        color: var(--muted);
+        border-radius: 18px;
+        border: 1px dashed var(--border);
+        background: rgba(255, 255, 255, 0.55);
+      }
+      table {
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        text-align: left;
+      }
+      th {
+        position: sticky;
+        top: 0;
+        background: rgba(248, 250, 252, 0.98);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      tbody tr:hover { background: rgba(31, 77, 209, 0.04); }
+      td a {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .kind {
+        display: inline-flex;
+        width: fit-content;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(31, 77, 209, 0.08);
+        color: #16378f;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .kind.muted {
+        background: rgba(93, 102, 118, 0.10);
+        color: var(--muted);
+      }
+      .desc { color: var(--muted); }
+      .path { color: var(--muted); font-size: 13px; }
+      .lead { max-width: 80ch; }
+      .section-title { margin-bottom: 10px; }
+      .empty {
+        color: var(--muted);
+        font-style: italic;
+      }
+      @media (max-width: 700px) {
+        header { flex-direction: column; align-items: flex-start; }
+        .shell { padding: 16px 14px 18px; }
+      }
+    </style>
+  </head>
+  <body x-data="navigatorData()">
+    <div class="shell">
+      <header>
+        <div>
+          <div class="badge">Static Navigator</div>
+          <h1>Day 4 file index</h1>
+          <p class="lead">Halaman ini dipakai sebagai pintu masuk ke semua file static di folder <code>day4</code>, termasuk microsite latihan WCAG dan file presentasi.</p>
+        </div>
+      </header>
+
+      <main>
+        <template x-for="day in days" :key="day.key">
+          <section class="group">
+            <div class="group-head">
+              <button class="group-toggle" type="button" @click="day.open = !day.open" :aria-expanded="day.open.toString()">
+                <span class="chevron" :class="day.open ? 'open' : ''" aria-hidden="true">›</span>
+                <span class="group-title">
+                  <p class="section-title" x-text="day.kicker"></p>
+                  <h2 x-text="day.title"></h2>
+                  <p x-text="day.note"></p>
+                </span>
+              </button>
+            </div>
+            <template x-if="day.open && day.tasks.length">
+              <div>
+                <template x-for="task in day.tasks" :key="task.key">
+                  <section class="task-group">
+                    <div class="task-head">
+                      <h3 x-text="task.title"></h3>
+                      <p x-text="task.note"></p>
+                    </div>
+                    <template x-if="task.items.length">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Type</th>
+                              <th>Name</th>
+                              <th>Description</th>
+                              <th>Path</th>
+                              <th>Open</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <template x-for="item in task.items" :key="item.key">
+                              <tr>
+                                <td><span class="kind" :class="item.disabled ? 'muted' : ''" x-text="item.kind"></span></td>
+                                <td x-text="item.name"></td>
+                                <td class="desc" x-text="item.description"></td>
+                                <td class="path" x-text="item.path"></td>
+                                <td>
+                                  <template x-if="item.href">
+                                    <a :href="item.href" x-text="item.label"></a>
+                                  </template>
+                                  <template x-if="!item.href">
+                                    <span class="empty" x-text="item.label"></span>
+                                  </template>
+                                </td>
+                              </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                      </div>
+                    </template>
+                    <template x-if="!task.items.length">
+                      <div class="empty-panel">Masih kosong.</div>
+                    </template>
+                  </section>
+                </template>
+              </div>
+            </template>
+            <template x-if="day.open && !day.tasks.length">
+              <div class="empty-panel">Masih kosong.</div>
+            </template>
+          </section>
+        </template>
+      </main>
+    </div>
+    <script>
+      function navigatorData() {
+        return {
+          days: [
+            {
+              key: "day1",
+              kicker: "Day 1",
+              title: "Day 1",
+              note: "Masih kosong.",
+              open: false,
+              tasks: [],
+            },
+            {
+              key: "day2",
+              kicker: "Day 2",
+              title: "Day 2",
+              note: "Masih kosong.",
+              open: false,
+              tasks: [],
+            },
+            {
+              key: "day3",
+              kicker: "Day 3",
+              title: "Day 3",
+              note: "Masih kosong.",
+              open: false,
+              tasks: [],
+            },
+            {
+              key: "day4",
+              kicker: "Day 4",
+              title: "Day 4",
+              note: "Semua file yang ada sekarang berada di sini.",
+              open: true,
+              tasks: [
+                {
+                  key: "task1",
+                  title: "Task 1",
+                  note: "Presentasi dan worksheet.",
+                  items: [
+                    {
+                      key: "day4-task1-presentation",
+                      kind: "HTML",
+                      name: "Task 1 presentation",
+                      description: "File presentasi untuk Task 1.",
+                      path: "day4/presentasi_and_task1.html",
+                      href: "./day4/presentasi_and_task1.html",
+                      label: "Open file",
+                    },
+                    {
+                      key: "day4-task1-doc",
+                      kind: "DOCX",
+                      name: "Task 1 worksheet",
+                      description: "Worksheet untuk Task 1.",
+                      path: "day4/assets/docs/wcag_task1_student_worksheet.docx",
+                      href: "./day4/assets/docs/wcag_task1_student_worksheet.docx",
+                      label: "Download",
+                    },
+                  ],
+                },
+                {
+                  key: "task2",
+                  title: "Task 2",
+                  note: "Presentasi dan worksheet.",
+                  items: [
+                    {
+                      key: "day4-task2-presentation",
+                      kind: "HTML",
+                      name: "Task 2 presentation",
+                      description: "File presentasi untuk Task 2.",
+                      path: "day4/presentasi_and_task2.html",
+                      href: "./day4/presentasi_and_task2.html",
+                      label: "Open file",
+                    },
+                    {
+                      key: "day4-task2-doc",
+                      kind: "DOCX",
+                      name: "Task 2 worksheet",
+                      description: "Worksheet untuk Task 2.",
+                      path: "day4/assets/docs/wcag_task2_student_worksheet.docx",
+                      href: "./day4/assets/docs/wcag_task2_student_worksheet.docx",
+                      label: "Download",
+                    },
+                  ],
+                },
+                {
+                  key: "task3",
+                  title: "Task 3",
+                  note: "Study case masuk ke sini.",
+                  items: [
+                    {
+                      key: "day4-task3-presentation",
+                      kind: "HTML",
+                      name: "Task 3 presentation",
+                      description: "File presentasi untuk Task 3.",
+                      path: "day4/presentasi_and_task3.html",
+                      href: "./day4/presentasi_and_task3.html",
+                      label: "Open file",
+                    },
+                    {
+                      key: "day4-task3-study-case",
+                      kind: "HTML",
+                      name: "WCAG study case site",
+                      description: "Microsite utama untuk study case Task 3.",
+                      path: "day4/resource/wcag_study_case_static_site/index.html",
+                      href: "./day4/resource/wcag_study_case_static_site/index.html",
+                      label: "Open site",
+                    },
+                    {
+                      key: "day4-task3-doc",
+                      kind: "DOCX",
+                      name: "Study case worksheet",
+                      description: "Worksheet untuk study case.",
+                      path: "day4/assets/docs/wcag_studycase_student_worksheet.docx",
+                      href: "./day4/assets/docs/wcag_studycase_student_worksheet.docx",
+                      label: "Download",
+                    },
+                  ],
+                },
+                {
+                  key: "task4",
+                  title: "Task 4",
+                  note: "Project transfer presentation dan worksheet.",
+                  items: [
+                    {
+                      key: "day4-task4-presentation",
+                      kind: "HTML",
+                      name: "Task 4 project transfer presentation",
+                      description: "Presentasi untuk Task 4.",
+                      path: "day4/assets/docs/wcag_task4_project_transfer_presentation.html",
+                      href: "./day4/assets/docs/wcag_task4_project_transfer_presentation.html",
+                      label: "Open file",
+                    },
+                    {
+                      key: "day4-task4-doc",
+                      kind: "DOCX",
+                      name: "Task 4 worksheet",
+                      description: "Worksheet untuk Task 4.",
+                      path: "day4/assets/docs/wcag_task4_student_worksheet.docx",
+                      href: "./day4/assets/docs/wcag_task4_student_worksheet.docx",
+                      label: "Download",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "day5",
+              kicker: "Day 5",
+              title: "Day 5",
+              note: "Masih kosong.",
+              open: false,
+              tasks: [],
+            },
+          ],
+        };
+      }
+    </script>
+  </body>
+</html>
